@@ -1,0 +1,43 @@
+@theme inline {
+  /* Tipography */
+  --text-heading-lg: 30px;
+  --text-heading-lg--line-height: 36px;
+
+  --text-heading: 20px;
+  --text-heading--line-height: 24px;
+
+  --text-body: 16px;
+  --text-body--line-height: 24px;
+
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 20px;
+
+  /* Colors */
+  --color-high-contrast: var(--high-contrast);
+  --color-muted: var(--muted);
+  --color-muted-light: var(--muted-light);
+  --color-emphasis: var(--emphasis);
+  --color-border: var(--border);
+}
+
+:root {
+  --primary: #4f46e5;
+  --high-contrast: #0f172a;
+  --muted: #64748b;
+  --muted-light: #94A3B8;
+  --emphasis: #334155;
+  --border: #E2E8F0;
+  --background: #f6f7f8;
+  --card: #ffffff;
+}
+
+.dark {
+  --primary: #7c72f5;
+  --high-contrast: #e2e8f0;
+  --muted: #94a3b8;
+  --muted-light: #CBD5E1;
+  --emphasis: #CBD5E1;
+  --border: #334155;
+  --background: #111827;
+  --card: #000000;
+}
