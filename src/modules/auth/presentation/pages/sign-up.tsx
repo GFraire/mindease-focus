@@ -1,10 +1,12 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TextInput } from "@/shared/ui/components/form/text-input";
 import { BaseButton } from "@/shared/ui/components/form/base-button";
 import { Separator } from "@/shared/ui/components/ui/separator";
+import { useAuthStore } from "@/shared/ui/store/auth-store";
 import { HeaderLogin } from "../components/header";
 import {
   registerSchema,
@@ -15,6 +17,9 @@ import { makeRegisterUserUseCase } from "../../container";
 export function SignUp() {
   const registerUserUseCase = makeRegisterUserUseCase();
 
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuthStore();
+
   const {
     register,
     handleSubmit,
@@ -23,18 +28,24 @@ export function SignUp() {
     resolver: zodResolver(registerSchema),
   });
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated]);
+
   async function onSubmit(data: RegisterFormData) {
     try {
       await registerUserUseCase.execute(data);
 
       toast.success("Conta criada com sucesso 🎉", {
         description: "Bem-vindo ao MindEase Focus!",
-        position: "bottom-center"
+        position: "bottom-center",
       });
     } catch (error: any) {
       toast.error("Erro ao criar conta", {
         description: translateFirebaseError(error),
-        position: "bottom-center"
+        position: "bottom-center",
       });
     }
   }
