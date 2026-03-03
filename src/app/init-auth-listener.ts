@@ -7,7 +7,7 @@ export function initAuthListener() {
 
   setLoading(true);
 
-  onAuthStateChanged(auth, (firebaseUser) => {
+  const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
     if (firebaseUser) {
       setUser({
         id: firebaseUser.uid,
@@ -17,5 +17,9 @@ export function initAuthListener() {
     } else {
       setUser(null);
     }
+
+    setLoading(false);
   });
+
+  return unsubscribe;
 }

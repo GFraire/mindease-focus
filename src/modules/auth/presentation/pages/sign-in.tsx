@@ -1,42 +1,42 @@
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-
 import { zodResolver } from "@hookform/resolvers/zod";
+
 import { TextInput } from "@/shared/ui/components/form/text-input";
 import { BaseButton } from "@/shared/ui/components/form/base-button";
 import { Separator } from "@/shared/ui/components/ui/separator";
-import { translateAuthError } from "@/shared/ui/utils/translate-auth-error";
 import { HeaderLogin } from "../components/header";
 
-import {
-  registerSchema,
-  type RegisterFormData,
-} from "../schemas/register-schema";
+import { loginSchema, type LoginFormData } from "../schemas/login-schema";
+import { makeLoginUserUseCase } from "../../container";
+import { translateAuthError } from "@/shared/ui/utils/translate-auth-error";
 
-import { makeRegisterUserUseCase } from "../../container";
+export function SignIn() {
+  const loginUserUseCase = makeLoginUserUseCase();
 
-export function SignUp() {
-  const registerUserUseCase = makeRegisterUserUseCase();
+  const navigate = useNavigate();
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema),
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
   });
 
-  async function onSubmit(data: RegisterFormData) {
+  async function onSubmit(data: LoginFormData) {
     try {
-      await registerUserUseCase.execute(data);
+      await loginUserUseCase.execute(data);
 
-      toast.success("Conta criada com sucesso 🎉", {
-        description: "Bem-vindo ao MindEase Focus!",
+      toast.success("Login realizado com sucesso 🎉", {
+        description: "Bem-vindo de volta!",
         position: "bottom-center",
       });
+
+      navigate("/");
     } catch (error: any) {
-      toast.error("Erro ao criar conta", {
+      toast.error("Erro ao entrar", {
         description: translateAuthError(error),
         position: "bottom-center",
       });
@@ -50,11 +50,11 @@ export function SignUp() {
       <div className="w-full max-w-md p-6 sm:p-8 flex flex-col gap-8 bg-card rounded-lg shadow">
         <div className="flex flex-col gap-2">
           <span className="text-center text-heading-lg font-bold text-high-contrast">
-            Comece sua jornada
+            Bem-vindo de volta
           </span>
 
           <span className="text-center text-body text-muted">
-            Sua jornada para o foco e bem-estar <br /> começa aqui.
+            Acesse sua conta para continuar focado.
           </span>
         </div>
 
@@ -62,13 +62,6 @@ export function SignUp() {
           onSubmit={handleSubmit(onSubmit)}
           className="flex flex-col gap-2 w-full"
         >
-          <TextInput
-            label="Nome completo"
-            placeholder="Digite seu nome"
-            {...register("fullName")}
-            error={errors.fullName?.message}
-          />
-
           <TextInput
             label="E-mail"
             type="email"
@@ -78,7 +71,7 @@ export function SignUp() {
           />
 
           <TextInput
-            label="Crie uma senha"
+            label="Senha"
             type="password"
             placeholder="Digite sua senha"
             {...register("password")}
@@ -90,19 +83,19 @@ export function SignUp() {
             type="submit"
             loading={isSubmitting}
           >
-            Criar conta
+            Entrar
           </BaseButton>
         </form>
 
         <Separator />
 
         <span className="text-body text-muted text-center">
-          Já tem uma conta?{" "}
+          Ainda não tem uma conta?{" "}
           <Link
             className="underline text-body text-primary font-bold"
-            to="/sign-in"
+            to="/sign-up"
           >
-            Entrar
+            Cadastre-se agora
           </Link>
         </span>
       </div>

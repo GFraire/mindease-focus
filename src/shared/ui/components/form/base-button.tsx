@@ -1,8 +1,8 @@
-import type { ButtonHTMLAttributes } from "react";
+import type { ComponentProps } from "react";
 import { Spinner } from "../ui/spinner";
 import { Button } from "../ui/button";
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface BaseButtonProps extends ComponentProps<typeof Button> {
   loading?: boolean;
 }
 
@@ -11,11 +11,11 @@ export function BaseButton({
   disabled,
   children,
   ...props
-}: ButtonProps) {
+}: BaseButtonProps) {
   return (
-    <Button disabled={loading || disabled} {...props}>
+    <Button size="lg" disabled={loading || disabled} {...props}>
       {loading && <Spinner />}
-      
+
       {children}
     </Button>
   );

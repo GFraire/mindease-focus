@@ -1,6 +1,7 @@
-import { forwardRef, useId } from "react";
+import { forwardRef, useId, useState } from "react";
 import { Input } from "@/shared/ui/components/ui/input";
 import { cn } from "@/shared/lib/utils";
+import { Eye, EyeOff } from "lucide-react";
 
 interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -10,10 +11,13 @@ interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
   function TextInput(
-    { label, showLabel = true, className, id, error, ...props },
+    { label, showLabel = true, className, id, error, type, ...props },
     ref,
   ) {
     const inputId = id ?? useId();
+    const [showPassword, setShowPassword] = useState(false);
+
+    const isPassword = type === "password";
 
     return (
       <div className="flex flex-col gap-2">
@@ -26,19 +30,32 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           </label>
         )}
 
-        <div className="flex flex-col gap-0.5">
+        <div className="relative flex flex-col gap-0.5">
           <Input
-          ref={ref}
-          id={inputId}
-          className={cn(
-            "border-border rounded-md text-high-contrast placeholder:text-muted-light py-5",
-            error && "border-red-500 focus-visible:ring-red-500",
-            className,
-          )}
-          {...props}
-        />
+            ref={ref}
+            id={inputId}
+            type={isPassword ? (showPassword ? "text" : "password") : type}
+            className={cn(
+              "border-border rounded-md text-high-contrast placeholder:text-muted-light py-5",
+              isPassword && "pr-10",
+              error && "border-red-500 focus-visible:ring-red-500",
+              className,
+            )}
+            {...props}
+          />
 
-        {error && <span className="text-sm text-red-500">{error}</span>}
+          {isPassword && (
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-3 top-[50%] -translate-y-[50%] text-muted-light hover:text-high-contrast"
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          )}
+
+          {error && <span className="text-sm text-red-500">{error}</span>}
         </div>
       </div>
     );

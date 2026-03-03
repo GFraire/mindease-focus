@@ -12,6 +12,9 @@
   --text-body-sm: 14px;
   --text-body-sm--line-height: 20px;
 
+  --text-caption: 12px;
+  --text-caption--line-height: 20px;
+
   /* Colors */
   --color-high-contrast: var(--high-contrast);
   --color-muted: var(--muted);
