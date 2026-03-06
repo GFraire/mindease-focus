@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { LoginUserUseCase } from "../login-user-usecase";
+import { LoginUserUseCase } from "../login-user-use-case";
 import { User } from "../../../domain/entities/user";
 
 import { type AuthRepository } from "../../../domain/repositories/auth-repository";

@@ -1,7 +1,7 @@
-import { FirebaseAuthRepository } from "./infrastructure/firebase/firebase-auth.repository";
+import { FirebaseAuthRepository } from "./infrastructure/firebase/firebase-auth-repository";
 import { RegisterUserUseCase } from "./application/use-cases/register-user-use-case";
-import { LoginUserUseCase } from "./application/use-cases/login-user-usecase";
-import { LogoutUserUseCase } from "./application/use-cases/logout-user-usecase";
+import { LoginUserUseCase } from "./application/use-cases/login-user-use-case";
+import { LogoutUserUseCase } from "./application/use-cases/logout-user-use-case";
 
 export function makeRegisterUserUseCase() {
   const repository = new FirebaseAuthRepository();

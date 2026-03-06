@@ -10,7 +10,7 @@ import { HeaderLogin } from "../components/header";
 
 import { loginSchema, type LoginFormData } from "../schemas/login-schema";
 import { makeLoginUserUseCase } from "../../container";
-import { translateAuthError } from "@/shared/ui/utils/translate-auth-error";
+import { translateAuthError } from "@/shared/utils/translate/translate-auth-error";
 
 export function SignIn() {
   const loginUserUseCase = makeLoginUserUseCase();

@@ -1,17 +1,24 @@
-import { forwardRef, useId, useState } from "react";
+import {
+  forwardRef,
+  useId,
+  useState,
+  type InputHTMLAttributes,
+  type ReactNode,
+} from "react";
 import { Input } from "@/shared/ui/components/ui/input";
 import { cn } from "@/shared/lib/utils";
 import { Eye, EyeOff } from "lucide-react";
 
-interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface TextInputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   showLabel?: boolean;
   error?: string;
+  leftIcon?: ReactNode;
 }
 
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
   function TextInput(
-    { label, showLabel = true, className, id, error, type, ...props },
+    { label, showLabel = true, className, id, error, type, leftIcon, ...props },
     ref,
   ) {
     const inputId = id ?? useId();
@@ -31,6 +38,12 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
         )}
 
         <div className="relative flex flex-col gap-0.5">
+          {leftIcon && (
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-light pointer-events-none">
+              {leftIcon}
+            </span>
+          )}
+
           <Input
             ref={ref}
             id={inputId}
@@ -38,6 +51,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
             className={cn(
               "border-border rounded-md text-high-contrast placeholder:text-muted-light py-5",
               isPassword && "pr-10",
+              leftIcon && "pl-10",
               error && "border-red-500 focus-visible:ring-red-500",
               className,
             )}

@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { TextInput } from "@/shared/ui/components/form/text-input";
 import { BaseButton } from "@/shared/ui/components/form/base-button";
 import { Separator } from "@/shared/ui/components/ui/separator";
-import { translateAuthError } from "@/shared/ui/utils/translate-auth-error";
+import { translateAuthError } from "@/shared/utils/translate/translate-auth-error";
 import { HeaderLogin } from "../components/header";
 
 import {

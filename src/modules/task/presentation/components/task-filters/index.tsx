@@ -1,0 +1,40 @@
+import { Search } from "lucide-react";
+import { TextInput } from "@/shared/ui/components/form/text-input";
+import { DateFilter } from "./date-filter";
+
+type DateFilterType = "today" | "tomorrow" | "custom";
+
+interface TaskFiltersProps {
+  search: string;
+  onSearchChange: (value: string) => void;
+
+  dateFilter: DateFilterType;
+  customDate?: Date;
+
+  onDateChange: (filter: DateFilterType, date?: Date) => void;
+}
+
+export function TaskFilters({
+  search,
+  onSearchChange,
+  dateFilter,
+  customDate,
+  onDateChange,
+}: TaskFiltersProps) {
+  return (
+    <div className="flex flex-col gap-4">
+      <TextInput
+        placeholder="Procurar tarefa..."
+        leftIcon={<Search size={18} />}
+        value={search}
+        onChange={(e) => onSearchChange(e.target.value)}
+      />
+
+      <DateFilter
+        value={dateFilter}
+        customDate={customDate}
+        onChange={onDateChange}
+      />
+    </div>
+  );
+}

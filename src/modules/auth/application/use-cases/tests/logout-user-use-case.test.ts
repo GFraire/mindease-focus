@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { LogoutUserUseCase } from "../logout-user-usecase";
+import { LogoutUserUseCase } from "../logout-user-use-case";
 import { type AuthRepository } from "../../../domain/repositories/auth-repository";
 
 describe("LogoutUserUseCase", () => {
