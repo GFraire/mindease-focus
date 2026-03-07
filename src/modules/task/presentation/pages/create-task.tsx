@@ -1,20 +1,20 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useAuthStore } from "@/shared/ui/store/auth-store";
-import { TaskForm } from "../components/task-form";
+import { TaskForm, type TaskFormValues } from "../components/task-form";
 import { makeCreateTaskUseCase } from "../../container";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import type { CreateTaskDTO } from "../../application/dtos/create-task-dto";
 
 export function CreateTask() {
   const navigate = useNavigate();
 
-  const createTaskUseCase = makeCreateTaskUseCase();
-
   const user = useAuthStore((state) => state.user);
+
+  const createTaskUseCase = useMemo(() => makeCreateTaskUseCase(), []);
+
   const [isLoading, setIsLoading] = useState(false);
 
-  async function handleCreate(data: CreateTaskDTO) {
+  async function handleCreate(data: TaskFormValues) {
     if (!user) return;
 
     try {

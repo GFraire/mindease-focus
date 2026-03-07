@@ -42,9 +42,9 @@ export function TaskCard({
 }: TaskCardProps) {
   return (
     <div className="flex items-center justify-between rounded-lg border border-border bg-card p-4">
-      <div className={cn("flex items-center gap-4", pending && "opacity-70")}>
+      <div className={cn("flex items-center gap-4", pending && "opacity-70", task.completed && 'opacity-60')}>
         <Checkbox
-          className="cursor-pointer h-5 w-5"
+          className="cursor-pointer h-5 w-5 border-muted-light"
           checked={task.completed}
           onCheckedChange={(checked) =>
             onToggleComplete(task.id, Boolean(checked))

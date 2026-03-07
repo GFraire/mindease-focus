@@ -32,6 +32,7 @@ export class CreateTaskUseCase {
       scheduledFor,
       completed: false,
       createdAt: formatDateIsoString(new Date()),
+      inProgress: false,
     };
 
     await this.taskRepository.create(task);

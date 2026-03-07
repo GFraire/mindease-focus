@@ -1,31 +1,29 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  CalendarArrowDown,
-  CalendarCheck,
-  History,
-  Plus,
-  Sprout,
-} from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { BaseButton } from "@/shared/ui/components/form/base-button";
 import { Sidebar } from "@/shared/ui/components/sidebar";
 import { TaskFilters } from "../components/task-filters";
 import {
   makeBringPendingTasksToTodayUseCase,
+  makeDeleteTaskUseCase,
   makeListPendingTasksUseCase,
   makeListTasksByDateUseCase,
+  makeToggleTaskCompletedUseCase,
 } from "../../container";
 import { useAuthStore } from "@/shared/ui/store/auth-store";
 import type { Task } from "../../domain/entities/task";
-import { TaskCard } from "../components/task-card";
 import { useCognitiveSettingsStore } from "@/shared/ui/store/cognitive-settings-store";
 import { sortTasksByEnergy } from "../utils/sort";
-import { formatDate, isToday } from "@/shared/utils/date/date-helper";
+import { isToday } from "@/shared/utils/date/date-helper";
 import { toast } from "sonner";
+import { TaskListView } from "./task-list-view";
+import { TasksHeader } from "../components/task-header";
+import { TaskKanbanView } from "./task-kanban-view";
 
-type DateFilter = "today" | "tomorrow" | "custom";
+export type DateFilter = "today" | "tomorrow" | "custom";
 
-export function ListTasks() {
+export type TaskViewMode = "list" | "kanban";
+
+export function Tasks() {
   const listTasksByDateUseCase = useMemo(
     () => makeListTasksByDateUseCase(),
     [],
@@ -41,11 +39,19 @@ export function ListTasks() {
     [],
   );
 
+  const toggleTaskCompletedUseCase = useMemo(
+    () => makeToggleTaskCompletedUseCase(),
+    [],
+  );
+
+  const deleteTaskUseCase = useMemo(() => makeDeleteTaskUseCase(), []);
+
   const navigate = useNavigate();
 
   const user = useAuthStore((state) => state.user);
   const energyLevel = useCognitiveSettingsStore((state) => state.energy);
 
+  const [viewMode, setViewMode] = useState<TaskViewMode>("list");
   const [taskTitle, setTaskTitle] = useState("");
   const [dateFilter, setDateFilter] = useState<DateFilter>("today");
   const [customDate, setCustomDate] = useState<Date>(new Date());
@@ -168,30 +174,71 @@ export function ListTasks() {
     }
   }
 
+  async function handleDeleteTask(taskId: string) {
+    try {
+      await deleteTaskUseCase.execute(taskId);
+
+      setDateTasks((prev) => prev.filter((task) => task.id !== taskId));
+      setPendingTasks((prev) => prev.filter((task) => task.id !== taskId));
+
+      toast.success("Tarefa removida", {
+        position: "bottom-center",
+      });
+    } catch (err) {
+      console.error(err);
+
+      toast.error("Erro ao remover tarefa", {
+        position: "bottom-center",
+      });
+    }
+  }
+
+  async function handleToggleCompleted(taskId: string, completed: boolean) {
+    try {
+      await toggleTaskCompletedUseCase.execute(taskId, completed);
+
+      setDateTasks((prev) =>
+        prev.map((task) =>
+          task.id === taskId ? { ...task, completed } : task,
+        ),
+      );
+
+      setPendingTasks((prev) =>
+        prev.map((task) =>
+          task.id === taskId ? { ...task, completed } : task,
+        ),
+      );
+    } catch (err) {
+      console.error(err);
+
+      toast.error("Erro ao atualizar tarefa", {
+        position: "bottom-center",
+      });
+    }
+  }
+
+  function handleEditTask(task: Task) {
+    navigate(`/edit-task/${task.id}`, { state: task });
+  }
+
+  function handleFocusTask(task: Task) {
+    navigate(`/focus-task/${task.id}`, { state: task });
+  }
+
+  function handleChangeViewMode(viewMode: TaskViewMode) {
+    setViewMode(viewMode);
+  }
+
   return (
-    <div className="flex h-full w-full">
+    <div className="flex h-screen w-full">
       <Sidebar />
 
-      <div className="flex flex-col gap-6 p-8 w-full overflow-auto">
-        <div className="flex gap-2 items-center w-full">
-          <div className="flex flex-col flex-1 gap-1">
-            <h3 className="text-high-contrast text-heading-lg font-bold">
-              Lista de tarefas
-            </h3>
-
-            <span className="text-body text-muted">
-              Sua lista organizada por prioridade de execução e energia.
-            </span>
-          </div>
-
-          <BaseButton
-            className="bg-primary text-white! cursor-pointer"
-            onClick={() => navigate("/create-task")}
-          >
-            <Plus />
-            Nova tarefa
-          </BaseButton>
-        </div>
+      <div className="flex flex-col gap-6 p-8 w-full h-screen">
+        <TasksHeader
+          viewMode={viewMode}
+          onCreateTask={() => navigate("/create-task")}
+          onChangeViewMode={handleChangeViewMode}
+        />
 
         <TaskFilters
           search={taskTitle}
@@ -204,87 +251,35 @@ export function ListTasks() {
           }}
         />
 
-        {showPendingTasks && (
-          <div className="flex flex-col gap-4">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-2">
-                <History className="text-muted" />
-
-                <span className="text-muted font-semibold text-body">
-                  TAREFAS PENDENTES
-                </span>
-
-                {loading && (
-                  <span className="text-xs text-muted animate-pulse">
-                    atualizando...
-                  </span>
-                )}
-              </div>
-
-              <BaseButton
-                className="[&_svg]:size-5! text-primary rounded-full border-primary! font-bold cursor-pointer bg-primary/10! hover:bg-primary/20! hover:text-primary!"
-                loading={bringingToToday}
-                variant="outline"
-                onClick={handleBringAllToToday}
-              >
-                <CalendarArrowDown className="text-primary" />
-
-                <span className="text-body">
-                  {bringingToToday ? "Movendo..." : "Trazer todas para hoje"}
-                </span>
-              </BaseButton>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              {filteredPendingTasks.map((task) => (
-                <TaskCard
-                  key={task.id}
-                  pending
-                  task={task}
-                  onBringToToday={handleBringTaskToToday}
-                />
-              ))}
-            </div>
-          </div>
+        {viewMode === "list" && (
+          <TaskListView
+            dateFilter={dateFilter}
+            customDate={customDate}
+            loading={loading}
+            dateTasks={dateTasks}
+            filteredPendingTasks={filteredPendingTasks}
+            filteredDateTasks={filteredDateTasks}
+            bringingToToday={bringingToToday}
+            showPendingTasks={showPendingTasks}
+            showDateTasks={showDateTasks}
+            onBringAllToToday={handleBringAllToToday}
+            onBringToToday={handleBringTaskToToday}
+            onDelete={handleDeleteTask}
+            onEdit={handleEditTask}
+            onStartFocus={handleFocusTask}
+            onToggleComplete={handleToggleCompleted}
+          />
         )}
 
-        {showDateTasks && (
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-2">
-              <CalendarCheck className="text-muted" />
-
-              <span className="text-muted font-semibold text-body">
-                PARA {dateFilter === "today" ? "HOJE" : formatDate(customDate)}
-              </span>
-
-              {loading && (
-                <span className="text-xs text-muted animate-pulse">
-                  atualizando...
-                </span>
-              )}
-            </div>
-
-            <div className="flex flex-col gap-2">
-              {filteredDateTasks.map((task) => (
-                <TaskCard key={task.id} task={task} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {dateTasks.length === 0 && !loading && (
-          <div className="flex items-center justify-center h-full flex-col gap-4 py-10">
-            <Sprout className="mb-4" size={150} />
-
-            <span className="text-heading font-bold text-high-contrast">
-              Sua lista está limpa
-            </span>
-
-            <span className="text-muted text-body text-center">
-              Que tal aproveitar este momento para planejar algo novo? <br />
-              Adicione sua próxima tarefa e continue avançando.
-            </span>
-          </div>
+        {viewMode === "kanban" && (
+          <TaskKanbanView
+            filteredPendingTasks={filteredPendingTasks}
+            filteredDateTasks={filteredDateTasks}
+            onDelete={handleDeleteTask}
+            onEdit={handleEditTask}
+            onStartFocus={handleFocusTask}
+            onToggleComplete={handleToggleCompleted}
+          />
         )}
       </div>
     </div>

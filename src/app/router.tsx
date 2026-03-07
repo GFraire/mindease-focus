@@ -4,7 +4,8 @@ import { SignUp } from "@/modules/auth/presentation/pages/sign-up";
 import { SignIn } from "@/modules/auth/presentation/pages/sign-in";
 import { Home } from "@/modules/task/presentation/pages/home";
 import { CreateTask } from "@/modules/task/presentation/pages/create-task";
-import { ListTasks } from "@/modules/task/presentation/pages/list-tasks";
+import { Tasks } from "@/modules/task/presentation/pages/tasks";
+import { EditTask } from "@/modules/task/presentation/pages/edit-task";
 
 export function Router() {
   return (
@@ -19,7 +20,11 @@ export function Router() {
       </Route>
 
       <Route element={<PrivateRoute />}>
-        <Route path="/list-tasks" element={<ListTasks />} />
+        <Route path="/edit-task/:taskId" element={<EditTask />} />
+      </Route>
+
+      <Route element={<PrivateRoute />}>
+        <Route path="/tasks" element={<Tasks />} />
       </Route>
 
       <Route element={<PrivateRoute />}>

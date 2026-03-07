@@ -50,7 +50,7 @@ export function Sidebar() {
 
         <nav className="flex flex-1 flex-col gap-2">
           <SidebarItem to="/" icon={Home} label="Início" />
-          <SidebarItem to="/list-tasks" icon={CheckSquare} label="Tarefas" />
+          <SidebarItem to="/tasks" icon={CheckSquare} label="Tarefas" />
 
           <div className="mt-auto flex flex-col gap-2">
             <Separator />

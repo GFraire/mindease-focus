@@ -5,8 +5,8 @@ export type FocusDuration = 15 | 30 | 45 | 60;
 export interface CreateTaskDTO {
   title: string;
   subtasks: string[];
-  energy: EnergyLevel;
   when: WhenToDo;
+  energy: EnergyLevel;
   focusDuration: FocusDuration;
-  date?: Date;
+  date: Date;
 }

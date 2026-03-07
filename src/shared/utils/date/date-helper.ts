@@ -25,3 +25,19 @@ export function isToday(date: Date) {
     date.getDate() === today.getDate()
   );
 }
+
+export function getWhenFromDate(date: Date): "today" | "tomorrow" | "custom" {
+  if (isToday(date)) return "today";
+
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const isTomorrow =
+    date.getFullYear() === tomorrow.getFullYear() &&
+    date.getMonth() === tomorrow.getMonth() &&
+    date.getDate() === tomorrow.getDate();
+
+  if (isTomorrow) return "tomorrow";
+
+  return "custom";
+}

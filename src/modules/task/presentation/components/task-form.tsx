@@ -19,7 +19,7 @@ export interface TaskFormValues {
   energy: EnergyLevel;
   when: WhenToDo;
   focusDuration: FocusDuration;
-  date: Date | undefined;
+  date: Date;
 }
 
 interface TaskFormProps {
@@ -48,7 +48,7 @@ export function TaskForm({
       energy: "medium",
       when: "today",
       focusDuration: 30,
-      date: undefined,
+      date: new Date(),
     },
   );
 
@@ -78,11 +78,17 @@ export function TaskForm({
       if (key === "when") {
         const when = value as WhenToDo;
 
-        if (when === "custom") {
-          return { ...prev, when, date: addDays(2) };
+        if (when === "today") {
+          return { ...prev, when, date: new Date() };
         }
 
-        return { ...prev, when, date: undefined };
+        if (when === "tomorrow") {
+          return { ...prev, when, date: addDays(1) };
+        }
+
+        if (when === "custom") {
+          return { ...prev, when };
+        }
       }
 
       return { ...prev, [key]: value };
@@ -223,7 +229,7 @@ export function TaskForm({
         {values.when === "custom" && (
           <InputDatePicker
             value={values.date}
-            onChange={(date) => update("date", date)}
+            onChange={(date) => update("date", date!)}
             disabled={{ before: addDays(2) }}
           />
         )}

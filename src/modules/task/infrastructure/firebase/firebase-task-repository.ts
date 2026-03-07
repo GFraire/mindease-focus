@@ -6,6 +6,8 @@ import {
   getDocs,
   doc,
   updateDoc,
+  deleteDoc,
+  getDoc,
 } from "firebase/firestore";
 import { db } from "@/shared/lib/firebase/db";
 import type { TaskRepository } from "../../domain/repositories/task-repository";
@@ -61,5 +63,22 @@ export class FirebaseTaskRepository implements TaskRepository {
     await updateDoc(taskRef, data);
   }
 
-  async delete(taskId: string): Promise<void> {}
+  async delete(taskId: string): Promise<void> {
+    const taskRef = doc(db, "tasks", taskId);
+
+    await deleteDoc(taskRef);
+  }
+
+  async findById(taskId: string): Promise<Task | null> {
+    const taskRef = doc(db, "tasks", taskId);
+
+    const snapshot = await getDoc(taskRef);
+
+    if (!snapshot.exists()) return null;
+
+    return {
+      id: snapshot.id,
+      ...snapshot.data(),
+    } as Task;
+  }
 }
