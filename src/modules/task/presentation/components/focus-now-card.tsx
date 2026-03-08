@@ -20,37 +20,55 @@ export function FocusNowCard({
 }: FocusNowCardProps) {
   const duration = task.focusDuration ?? 60;
 
+  const titleId = `focus-task-${task.id}`;
+
   return (
-    <div className="w-full flex rounded-md shadow overflow-hidden border border-border bg-card">
-      <div className="flex items-center justify-center aspect-square bg-linear-to-b from-indigo-600 to-purple-600 px-10">
-        <Target className="h-12 w-12 text-white" />
+    <section
+      aria-labelledby={titleId}
+      aria-live="polite"
+      className="w-full flex rounded-md shadow overflow-hidden border border-border bg-card"
+    >
+      <div
+        className="flex items-center justify-center w-50 bg-linear-to-b from-indigo-600 to-purple-600"
+        aria-hidden="true"
+      >
+        <Target className="h-12 w-12 text-white" aria-hidden="true" />
       </div>
 
       <div className="flex flex-1 flex-col justify-between gap-4 p-6">
-        <div className="flex flex-col gap-2">
+        <header className="flex flex-col gap-2">
           <span className="text-caption font-bold uppercase tracking-wide text-primary">
             Em foco agora
           </span>
 
-          <h2 className="text-heading-lg font-bold text-high-contrast">
+          <h2
+            id={titleId}
+            className="text-heading-lg font-bold text-high-contrast"
+          >
             {task.title}
           </h2>
 
           <p className="text-body text-muted">
             De acordo com o seu painel cognitivo, esta é a tarefa que mais
-            merece sua atenção agora. <br />
+            merece sua atenção agora.
+            <br />
             Concentre-se por{" "}
-            <span className="text-primary">{duration} minutos</span> sem
+            <strong className="text-primary">{duration} minutos</strong> sem
             distrações e faça progresso real.
           </p>
-        </div>
+        </header>
 
-        <div className="flex items-center gap-4">
+        <div
+          className="flex items-center gap-4"
+          role="group"
+          aria-label={`Ações da tarefa ${task.title}`}
+        >
           <Button
             onClick={() => onStart?.(task)}
-            className="gap-2 bg-primary cursor-pointer text-white! hover:bg-primary/80 font-semibold"
+            aria-label={`Iniciar foco na tarefa ${task.title} por ${duration} minutos`}
+            className="gap-2 bg-primary cursor-pointer text-white! hover:bg-primary/80 font-semibold focus:outline-none focus:ring-2 focus:ring-primary"
           >
-            <Play className="h-5 w-5" />
+            <Play className="h-5 w-5" aria-hidden="true" />
             Iniciar foco
           </Button>
 
@@ -62,6 +80,6 @@ export function FocusNowCard({
           />
         </div>
       </div>
-    </div>
+    </section>
   );
 }

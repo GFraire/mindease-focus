@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,9 +15,11 @@ import {
 } from "../schemas/register-schema";
 
 import { makeRegisterUserUseCase } from "../../container";
+import { useMemo } from "react";
 
 export function SignUp() {
-  const registerUserUseCase = makeRegisterUserUseCase();
+  const registerUserUseCase = useMemo(() => makeRegisterUserUseCase(), []);
+  const navigate = useNavigate();
 
   const {
     register,
@@ -35,6 +37,8 @@ export function SignUp() {
         description: "Bem-vindo ao MindEase Focus!",
         position: "bottom-center",
       });
+
+      navigate("/");
     } catch (error: any) {
       toast.error("Erro ao criar conta", {
         description: translateAuthError(error),
@@ -47,72 +51,89 @@ export function SignUp() {
     <div className="min-h-screen flex flex-col justify-between items-center bg-background">
       <HeaderLogin />
 
-      <div className="w-full max-w-md p-6 sm:p-8 flex flex-col gap-8 bg-card rounded-lg shadow">
-        <div className="flex flex-col gap-2">
-          <span className="text-center text-heading-lg font-bold text-high-contrast">
-            Comece sua jornada
-          </span>
+      <main
+        className="w-full flex justify-center"
+        aria-labelledby="signup-title"
+      >
+        <div className="w-full max-w-md p-6 sm:p-8 flex flex-col gap-8 bg-card rounded-lg shadow">
+          <header className="flex flex-col gap-2">
+            <h1
+              id="signup-title"
+              className="text-center text-heading-lg font-bold text-high-contrast"
+            >
+              Comece sua jornada
+            </h1>
 
-          <span className="text-center text-body text-muted">
-            Sua jornada para o foco e bem-estar <br /> começa aqui.
-          </span>
+            <p className="text-center text-body text-muted">
+              Sua jornada para o foco e bem-estar <br />
+              começa aqui.
+            </p>
+          </header>
+
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="flex flex-col gap-2 w-full"
+            aria-label="Formulário de criação de conta"
+          >
+            <TextInput
+              label="Nome completo"
+              placeholder="Digite seu nome"
+              {...register("fullName")}
+              error={errors.fullName?.message}
+              aria-invalid={!!errors.fullName}
+              aria-describedby={errors.fullName ? "fullname-error" : undefined}
+            />
+
+            <TextInput
+              label="E-mail"
+              type="email"
+              placeholder="Digite seu e-mail"
+              {...register("email")}
+              error={errors.email?.message}
+              aria-invalid={!!errors.email}
+              aria-describedby={errors.email ? "email-error" : undefined}
+            />
+
+            <TextInput
+              label="Crie uma senha"
+              type="password"
+              placeholder="Digite sua senha"
+              {...register("password")}
+              error={errors.password?.message}
+              aria-invalid={!!errors.password}
+              aria-describedby={errors.password ? "password-error" : undefined}
+            />
+
+            <BaseButton
+              className="mt-6 w-full flex items-center justify-center gap-2 cursor-pointer"
+              type="submit"
+              loading={isSubmitting}
+              aria-busy={isSubmitting}
+            >
+              Criar conta
+            </BaseButton>
+          </form>
+
+          <Separator />
+
+          <p className="text-body text-muted text-center">
+            Já tem uma conta?{" "}
+            <Link
+              className="underline text-body text-primary font-bold"
+              to="/sign-in"
+            >
+              Entrar
+            </Link>
+          </p>
         </div>
+      </main>
 
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-2 w-full"
-        >
-          <TextInput
-            label="Nome completo"
-            placeholder="Digite seu nome"
-            {...register("fullName")}
-            error={errors.fullName?.message}
-          />
-
-          <TextInput
-            label="E-mail"
-            type="email"
-            placeholder="Digite seu e-mail"
-            {...register("email")}
-            error={errors.email?.message}
-          />
-
-          <TextInput
-            label="Crie uma senha"
-            type="password"
-            placeholder="Digite sua senha"
-            {...register("password")}
-            error={errors.password?.message}
-          />
-
-          <BaseButton
-            className="mt-6 w-full flex items-center justify-center gap-2 cursor-pointer"
-            type="submit"
-            loading={isSubmitting}
-          >
-            Criar conta
-          </BaseButton>
-        </form>
-
-        <Separator />
-
-        <span className="text-body text-muted text-center">
-          Já tem uma conta?{" "}
-          <Link
-            className="underline text-body text-primary font-bold"
-            to="/sign-in"
-          >
-            Entrar
-          </Link>
-        </span>
-      </div>
-
-      <div className="flex items-center h-20">
+      <footer className="flex items-center h-20">
         <span className="text-center text-muted-light text-body-sm">
           © {new Date().getFullYear()} MindEase Focus. Projetado para sua
           tranquilidade.
         </span>
-      </div>
+      </footer>
     </div>
   );
 }

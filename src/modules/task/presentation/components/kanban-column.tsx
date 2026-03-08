@@ -60,7 +60,7 @@ export function KanbanColumn({ title, count, color, children }: Props) {
       </div>
 
       <div
-        className="h-full overflow-y-auto flex flex-col p-2 gap-2 rounded-md border border-border bg-border/40
+        className="h-full overflow-y-auto flex flex-col p-2 rounded-md border border-border bg-border/40
         [&::-webkit-scrollbar]:w-2
         [&::-webkit-scrollbar-track]:bg-transparent
         [&::-webkit-scrollbar-thumb]:bg-muted/40

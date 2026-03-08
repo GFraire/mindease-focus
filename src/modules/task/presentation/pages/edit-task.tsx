@@ -19,26 +19,24 @@ export function EditTask() {
   const user = useAuthStore((state) => state.user);
 
   const getTaskByIdUseCase = useMemo(() => makeGetTaskByIdUseCase(), []);
-
   const updateTaskUseCase = useMemo(() => makeUpdateTaskUseCase(), []);
 
   const [isLoading, setIsLoading] = useState(false);
+
   const [initialData, setInitialData] = useState<TaskFormValues | null>(() => {
     if (!stateTask) return null;
 
     const [year, month, day] = stateTask.scheduledFor.split("-").map(Number);
-
     const date = new Date(year, month - 1, day);
-
     const when = getWhenFromDate(date);
 
     return {
       title: stateTask.title,
       subtasks: stateTask.subtasks ?? [],
       energy: stateTask.energy,
-      when: when,
+      when,
       focusDuration: stateTask.focusDuration,
-      date: date,
+      date,
     };
   });
 
@@ -56,18 +54,16 @@ export function EditTask() {
         }
 
         const [year, month, day] = task.scheduledFor.split("-").map(Number);
-
         const date = new Date(year, month - 1, day);
-
         const when = getWhenFromDate(date);
 
         setInitialData({
           title: task.title,
           subtasks: task.subtasks ?? [],
           energy: task.energy,
-          when: when,
+          when,
           focusDuration: task.focusDuration,
-          date: date,
+          date,
         });
       } catch (err) {
         console.error(err);
@@ -76,7 +72,7 @@ export function EditTask() {
     }
 
     loadTask();
-  }, [taskId]);
+  }, [taskId, stateTask, getTaskByIdUseCase, navigate]);
 
   async function handleUpdate(data: CreateTaskDTO) {
     if (!user || !taskId) return;
@@ -102,18 +98,31 @@ export function EditTask() {
     }
   }
 
-  if (!initialData) return null;
-
   return (
-    <div className="flex items-center justify-center bg-background py-10 scroll-auto">
-      <TaskForm
-        title="Editar tarefa"
-        subtitle="Ajuste os detalhes da sua tarefa."
-        submitLabel="Salvar alterações"
-        initialData={initialData}
-        isLoading={isLoading}
-        onSubmit={handleUpdate}
-      />
-    </div>
+    <main
+      className="flex items-center justify-center bg-background py-10 scroll-auto"
+      aria-labelledby="edit-task-title"
+    >
+      <h1 id="edit-task-title" className="sr-only">
+        Editar tarefa
+      </h1>
+
+      {!initialData ? (
+        <div role="status" aria-live="polite" className="text-muted text-sm">
+          Carregando tarefa...
+        </div>
+      ) : (
+        <section aria-label="Formulário de edição de tarefa">
+          <TaskForm
+            title="Editar tarefa"
+            subtitle="Ajuste os detalhes da sua tarefa."
+            submitLabel="Salvar alterações"
+            initialData={initialData}
+            isLoading={isLoading}
+            onSubmit={handleUpdate}
+          />
+        </section>
+      )}
+    </main>
   );
 }

@@ -69,8 +69,14 @@ export function DateFilter({ value, customDate, onChange }: DateFilterProps) {
   }
 
   return (
-    <div className="flex gap-2">
+    <div
+      className="flex gap-2"
+      role="group"
+      aria-label="Filtro de data das tarefas"
+    >
       <BaseButton
+        aria-pressed={value === "today"}
+        aria-label="Mostrar tarefas de hoje"
         className={cn(
           "text-muted bg-card border border-border hover:bg-card/10 cursor-pointer",
           value === "today" &&
@@ -82,6 +88,8 @@ export function DateFilter({ value, customDate, onChange }: DateFilterProps) {
       </BaseButton>
 
       <BaseButton
+        aria-pressed={value === "tomorrow"}
+        aria-label="Mostrar tarefas de amanhã"
         className={cn(
           "text-muted bg-card border border-border hover:bg-card/10 cursor-pointer",
           value === "tomorrow" &&
@@ -95,6 +103,10 @@ export function DateFilter({ value, customDate, onChange }: DateFilterProps) {
       <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
         <PopoverTrigger asChild>
           <BaseButton
+            aria-haspopup="dialog"
+            aria-expanded={calendarOpen}
+            aria-label="Selecionar outra data no calendário"
+            aria-pressed={value === "custom"}
             className={cn(
               "text-muted bg-card border border-border hover:bg-card/10 cursor-pointer",
               value === "custom" &&
@@ -102,12 +114,16 @@ export function DateFilter({ value, customDate, onChange }: DateFilterProps) {
             )}
             onClick={() => handleDateChange("custom")}
           >
-            <CalendarIcon className="h-5 w-5" />
+            <CalendarIcon className="h-5 w-5" aria-hidden="true" />
             Outro dia
           </BaseButton>
         </PopoverTrigger>
 
-        <PopoverContent className="w-auto p-0">
+        <PopoverContent
+          className="w-auto p-0"
+          role="dialog"
+          aria-label="Selecionar data no calendário"
+        >
           <Calendar
             mode="single"
             selected={customDate}

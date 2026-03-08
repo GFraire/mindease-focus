@@ -46,99 +46,124 @@ export function TaskListView({
   onToggleComplete,
 }: Props) {
   return (
-    <div className="overflow-auto h-full flex flex-col gap-6">
+    <div
+      className="overflow-auto h-full flex flex-col gap-6"
+      aria-live="polite"
+      aria-busy={loading}
+    >
       {showLateTasks && (
-        <div className="flex flex-col gap-4">
-          <div className="flex items-start justify-between">
+        <section
+          className="flex flex-col gap-4"
+          aria-labelledby="late-tasks-title"
+        >
+          <header className="flex items-start justify-between">
             <div className="flex items-center gap-2">
-              <History className="text-muted" />
+              <History className="text-muted" aria-hidden="true" />
 
-              <span className="text-muted font-semibold text-body">
-                TAREFAS ATRASADAS
-              </span>
+              <h2
+                id="late-tasks-title"
+                className="text-muted font-semibold text-body"
+              >
+                Tarefas atrasadas
+              </h2>
 
               {loading && (
-                <span className="text-xs text-muted animate-pulse">
+                <span
+                  className="text-xs text-muted animate-pulse"
+                  role="status"
+                >
                   atualizando...
                 </span>
               )}
             </div>
 
             <BaseButton
-              className="[&_svg]:size-5! text-primary rounded-full border-primary! font-bold cursor-pointer bg-primary/10! hover:bg-primary/20! hover:text-primary! "
+              className="[&_svg]:size-5! text-primary rounded-full border-primary! font-bold cursor-pointer bg-primary/10! hover:bg-primary/20! hover:text-primary!"
               loading={bringingToToday}
               variant="outline"
               onClick={onBringAllToToday}
+              aria-label="Trazer todas as tarefas atrasadas para hoje"
             >
-              <CalendarArrowDown className="text-primary" />
+              <CalendarArrowDown className="text-primary" aria-hidden="true" />
 
               <span className="text-body">
                 {bringingToToday ? "Movendo..." : "Trazer todas para hoje"}
               </span>
             </BaseButton>
-          </div>
+          </header>
 
-          <div className="flex flex-col gap-2">
+          <ul role="list" className="flex flex-col gap-2">
             {filteredLateTasks.map((task) => (
-              <TaskCard
-                key={task.id}
-                late
-                task={task}
-                onBringToToday={onBringToToday}
-                onDelete={onDelete}
-                onEdit={onEdit}
-                onStartFocus={onStartFocus}
-                onToggleComplete={onToggleComplete}
-              />
+              <li key={task.id}>
+                <TaskCard
+                  late
+                  task={task}
+                  onBringToToday={onBringToToday}
+                  onDelete={onDelete}
+                  onEdit={onEdit}
+                  onStartFocus={onStartFocus}
+                  onToggleComplete={onToggleComplete}
+                />
+              </li>
             ))}
-          </div>
-        </div>
+          </ul>
+        </section>
       )}
 
       {showDateTasks && (
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-2">
-            <CalendarCheck className="text-muted" />
+        <section
+          className="flex flex-col gap-4"
+          aria-labelledby="date-tasks-title"
+        >
+          <header className="flex items-center gap-2">
+            <CalendarCheck className="text-muted" aria-hidden="true" />
 
-            <span className="text-muted font-semibold text-body">
-              PARA {dateFilter === "today" ? "HOJE" : formatDate(customDate)}
-            </span>
+            <h2
+              id="date-tasks-title"
+              className="text-muted font-semibold text-body"
+            >
+              Para {dateFilter === "today" ? "hoje" : formatDate(customDate)}
+            </h2>
 
             {loading && (
-              <span className="text-xs text-muted animate-pulse">
+              <span className="text-xs text-muted animate-pulse" role="status">
                 atualizando...
               </span>
             )}
-          </div>
+          </header>
 
-          <div className="flex flex-col gap-2">
+          <ul role="list" className="flex flex-col gap-2">
             {filteredDateTasks.map((task) => (
-              <TaskCard
-                key={task.id}
-                task={task}
-                onDelete={onDelete}
-                onEdit={onEdit}
-                onStartFocus={onStartFocus}
-                onToggleComplete={onToggleComplete}
-              />
+              <li key={task.id}>
+                <TaskCard
+                  task={task}
+                  onDelete={onDelete}
+                  onEdit={onEdit}
+                  onStartFocus={onStartFocus}
+                  onToggleComplete={onToggleComplete}
+                />
+              </li>
             ))}
-          </div>
-        </div>
+          </ul>
+        </section>
       )}
 
       {dateTasks.length === 0 && !loading && (
-        <div className="flex items-center justify-center h-full flex-col gap-4 py-10">
-          <Sprout className="mb-4" size={150} />
+        <section
+          className="flex items-center justify-center h-full flex-col gap-4 py-10"
+          aria-live="polite"
+        >
+          <Sprout className="mb-4" size={150} aria-hidden="true" />
 
-          <span className="text-heading font-bold text-high-contrast">
+          <h2 className="text-heading font-bold text-high-contrast">
             Sua lista está limpa
-          </span>
+          </h2>
 
-          <span className="text-muted text-body text-center">
+          <p className="text-muted text-body text-center">
             Que tal aproveitar este momento para planejar algo novo? <br />
             Adicione sua próxima tarefa e continue avançando.
-          </span>
-        </div>
+          </p>
+        </section>
       )}
     </div>
   );

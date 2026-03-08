@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Sidebar } from "@/shared/ui/components/sidebar";
 import { TaskFilters } from "../components/task-filters";
+
 import {
   makeBringLateTasksToTodayUseCase,
   makeDeleteTaskUseCase,
@@ -10,23 +11,25 @@ import {
   makeMoveTaskStatusUseCase,
   makeToggleTaskCompletedUseCase,
 } from "../../container";
+
 import { useAuthStore } from "@/shared/ui/store/auth-store";
 import type { Task } from "../../domain/entities/task";
 import { useCognitiveSettingsStore } from "@/shared/ui/store/cognitive-settings-store";
+
 import {
   sortTasksByEnergy,
   sortTasksByStatusAndEnergy,
 } from "../utils/sort-tasks";
+
 import { isToday } from "@/shared/utils/date/date-helper";
 import { toast } from "sonner";
+
 import { TaskListView } from "./task-list-view";
 import { TasksHeader } from "../components/task-header";
 import { TaskKanbanView } from "./task-kanban-view";
 
 export type DateFilter = "today" | "tomorrow" | "custom";
-
 export type TaskViewMode = "list" | "kanban";
-
 export type TaskStatus = "pending" | "inProgress";
 
 export function Tasks() {
@@ -35,10 +38,7 @@ export function Tasks() {
     [],
   );
 
-  const ListLateTasksUseCase = useMemo(
-    () => makeListLateTasksUseCase(),
-    [],
-  );
+  const ListLateTasksUseCase = useMemo(() => makeListLateTasksUseCase(), []);
 
   const BringLateTasksToTodayUseCase = useMemo(
     () => makeBringLateTasksToTodayUseCase(),
@@ -51,7 +51,6 @@ export function Tasks() {
   );
 
   const moveTaskStatusUseCase = useMemo(() => makeMoveTaskStatusUseCase(), []);
-
   const deleteTaskUseCase = useMemo(() => makeDeleteTaskUseCase(), []);
 
   const navigate = useNavigate();
@@ -63,15 +62,16 @@ export function Tasks() {
   const [taskTitle, setTaskTitle] = useState("");
   const [dateFilter, setDateFilter] = useState<DateFilter>("today");
   const [customDate, setCustomDate] = useState<Date>(new Date());
+
   const [lateTasks, setLateTasks] = useState<Task[]>([]);
   const [dateTasks, setDateTasks] = useState<Task[]>([]);
   const [filteredLateTasks, setFilteredLateTasks] = useState<Task[]>([]);
   const [filteredDateTasks, setFilteredDateTasks] = useState<Task[]>([]);
+
   const [loading, setLoading] = useState(false);
   const [bringingToToday, setBringingToToday] = useState(false);
 
   const showLateTasks = isToday(customDate) && lateTasks.length > 0;
-
   const showDateTasks = true;
 
   useEffect(() => {
@@ -93,10 +93,7 @@ export function Tasks() {
         }
 
         const sortedDate = sortTasksByStatusAndEnergy(dateTasks, energyLevel);
-        const sortedLate = sortTasksByStatusAndEnergy(
-          lateTasks,
-          energyLevel,
-        );
+        const sortedLate = sortTasksByStatusAndEnergy(lateTasks, energyLevel);
 
         setDateTasks(sortedDate);
         setLateTasks(sortedLate);
@@ -114,10 +111,7 @@ export function Tasks() {
 
   useEffect(() => {
     const sortedDateTasks = sortTasksByStatusAndEnergy(dateTasks, energyLevel);
-    const sortedLateTasks = sortTasksByStatusAndEnergy(
-      lateTasks,
-      energyLevel,
-    );
+    const sortedLateTasks = sortTasksByStatusAndEnergy(lateTasks, energyLevel);
 
     setDateTasks(sortedDateTasks);
     setLateTasks(sortedLateTasks);
@@ -135,6 +129,7 @@ export function Tasks() {
     setFilteredDateTasks(
       sortTasksByStatusAndEnergy(filteredDateTasks, energyLevel),
     );
+
     setFilteredLateTasks(
       sortTasksByStatusAndEnergy(filteredLateTasks, energyLevel),
     );
@@ -267,7 +262,7 @@ export function Tasks() {
         description: "O status da tarefa foi atualizado com sucesso.",
         position: "bottom-center",
       });
-    } catch (error) {
+    } catch {
       toast.error("Erro ao mover tarefa", {
         description: "Não foi possível atualizar o status da tarefa.",
         position: "bottom-center",
@@ -291,56 +286,74 @@ export function Tasks() {
     <div className="flex h-screen w-full">
       <Sidebar />
 
-      <div className="flex flex-col gap-6 p-8 w-full h-screen">
-        <TasksHeader
-          viewMode={viewMode}
-          onCreateTask={() => navigate("/create-task")}
-          onChangeViewMode={handleChangeViewMode}
-        />
+      <main
+        className="flex flex-col gap-6 p-8 w-full h-screen"
+        aria-labelledby="tasks-page-title"
+      >
+        <h1 id="tasks-page-title" className="sr-only">
+          Página de tarefas
+        </h1>
 
-        <TaskFilters
-          search={taskTitle}
-          onSearchChange={setTaskTitle}
-          dateFilter={dateFilter}
-          customDate={customDate}
-          onDateChange={(filter, date) => {
-            setDateFilter(filter);
-            if (date) setCustomDate(date);
-          }}
-        />
+        <header>
+          <TasksHeader
+            viewMode={viewMode}
+            onCreateTask={() => navigate("/create-task")}
+            onChangeViewMode={handleChangeViewMode}
+          />
+        </header>
 
-        {viewMode === "list" && (
-          <TaskListView
+        <section aria-label="Filtros de tarefas">
+          <TaskFilters
+            search={taskTitle}
+            onSearchChange={setTaskTitle}
             dateFilter={dateFilter}
             customDate={customDate}
-            loading={loading}
-            dateTasks={dateTasks}
-            filteredLateTasks={filteredLateTasks}
-            filteredDateTasks={filteredDateTasks}
-            bringingToToday={bringingToToday}
-            showLateTasks={showLateTasks}
-            showDateTasks={showDateTasks}
-            onBringAllToToday={handleBringAllToToday}
-            onBringToToday={handleBringTaskToToday}
-            onDelete={handleDeleteTask}
-            onEdit={handleEditTask}
-            onStartFocus={handleFocusTask}
-            onToggleComplete={handleToggleCompleted}
+            onDateChange={(filter, date) => {
+              setDateFilter(filter);
+              if (date) setCustomDate(date);
+            }}
           />
-        )}
+        </section>
 
-        {viewMode === "kanban" && (
-          <TaskKanbanView
-            filteredLateTasks={filteredLateTasks}
-            filteredDateTasks={filteredDateTasks}
-            onDelete={handleDeleteTask}
-            onEdit={handleEditTask}
-            onStartFocus={handleFocusTask}
-            onToggleComplete={handleToggleCompleted}
-            onMoveStatusTask={handleMoveTaskStatus}
-          />
-        )}
-      </div>
+        <section
+          aria-live="polite"
+          aria-busy={loading}
+          aria-label="Lista de tarefas"
+          className="flex-1"
+        >
+          {viewMode === "list" && (
+            <TaskListView
+              dateFilter={dateFilter}
+              customDate={customDate}
+              loading={loading}
+              dateTasks={dateTasks}
+              filteredLateTasks={filteredLateTasks}
+              filteredDateTasks={filteredDateTasks}
+              bringingToToday={bringingToToday}
+              showLateTasks={showLateTasks}
+              showDateTasks={showDateTasks}
+              onBringAllToToday={handleBringAllToToday}
+              onBringToToday={handleBringTaskToToday}
+              onDelete={handleDeleteTask}
+              onEdit={handleEditTask}
+              onStartFocus={handleFocusTask}
+              onToggleComplete={handleToggleCompleted}
+            />
+          )}
+
+          {viewMode === "kanban" && (
+            <TaskKanbanView
+              filteredLateTasks={filteredLateTasks}
+              filteredDateTasks={filteredDateTasks}
+              onDelete={handleDeleteTask}
+              onEdit={handleEditTask}
+              onStartFocus={handleFocusTask}
+              onToggleComplete={handleToggleCompleted}
+              onMoveStatusTask={handleMoveTaskStatus}
+            />
+          )}
+        </section>
+      </main>
     </div>
   );
 }

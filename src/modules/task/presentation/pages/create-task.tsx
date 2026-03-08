@@ -39,14 +39,31 @@ export function CreateTask() {
   }
 
   return (
-    <div className="flex items-center justify-center bg-background py-10 scroll-auto">
-      <TaskForm
-        title="Criar nova tarefa"
-        subtitle="Dê um passo de cada vez."
-        submitLabel="Salvar tarefa"
-        isLoading={isLoading}
-        onSubmit={handleCreate}
-      />
-    </div>
+    <main
+      className="flex items-center justify-center bg-background py-10 scroll-auto"
+      aria-labelledby="create-task-title"
+    >
+      {/* título acessível da página */}
+      <h1 id="create-task-title" className="sr-only">
+        Criar nova tarefa
+      </h1>
+
+      <section aria-label="Formulário de criação de tarefa">
+        <TaskForm
+          title="Criar nova tarefa"
+          subtitle="Dê um passo de cada vez."
+          submitLabel="Salvar tarefa"
+          isLoading={isLoading}
+          onSubmit={handleCreate}
+        />
+      </section>
+
+      {/* status para leitores de tela */}
+      {isLoading && (
+        <span role="status" aria-live="polite" className="sr-only">
+          Criando tarefa...
+        </span>
+      )}
+    </main>
   );
 }

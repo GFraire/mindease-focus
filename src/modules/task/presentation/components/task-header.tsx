@@ -9,7 +9,11 @@ type Props = {
   onChangeViewMode: (value: TaskViewMode) => void;
 };
 
-export function TasksHeader({ viewMode, onCreateTask, onChangeViewMode }: Props) {
+export function TasksHeader({
+  viewMode,
+  onCreateTask,
+  onChangeViewMode,
+}: Props) {
   const title = viewMode === "list" ? "Lista de tarefas" : "Quadro Kanban";
 
   const subtitle =
@@ -18,24 +22,33 @@ export function TasksHeader({ viewMode, onCreateTask, onChangeViewMode }: Props)
       : "Gerencie suas tarefas de forma calma e organizada.";
 
   return (
-    <div className="flex gap-3 items-center w-full">
+    <header
+      className="flex gap-3 items-center w-full"
+      aria-labelledby="tasks-header-title"
+    >
       <div className="flex flex-col flex-1 gap-1">
-        <h3 className="text-high-contrast text-heading-lg font-bold">
+        <h2
+          id="tasks-header-title"
+          className="text-high-contrast text-heading-lg font-bold"
+        >
           {title}
-        </h3>
+        </h2>
 
-        <span className="text-body text-muted">{subtitle}</span>
+        <p className="text-body text-muted">{subtitle}</p>
       </div>
 
-      <ViewSwitcher value={viewMode} onChange={onChangeViewMode} />
+      <div aria-label="Modo de visualização das tarefas">
+        <ViewSwitcher value={viewMode} onChange={onChangeViewMode} />
+      </div>
 
       <BaseButton
         className="bg-primary text-white! cursor-pointer"
         onClick={onCreateTask}
+        aria-label="Criar nova tarefa"
       >
-        <Plus />
+        <Plus aria-hidden="true" />
         Nova tarefa
       </BaseButton>
-    </div>
+    </header>
   );
 }

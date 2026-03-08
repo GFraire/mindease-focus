@@ -25,9 +25,7 @@ export function TaskKanbanView({
   const allTasks = [...filteredLateTasks, ...filteredDateTasks];
 
   const pending = allTasks.filter((t) => !t.completed && !t.inProgress);
-
   const inProgress = allTasks.filter((t) => !t.completed && t.inProgress);
-
   const done = allTasks.filter((t) => t.completed);
 
   function isLateTask(id: string) {
@@ -35,57 +33,95 @@ export function TaskKanbanView({
   }
 
   return (
-    <div className="grid grid-cols-3 gap-6 h-full min-h-0 overflow-hidden">
-      <KanbanColumn title="PENDENTE" count={pending.length} color="muted-light">
-        {pending.map((task) => (
-          <TaskCard
-            key={task.id}
-            task={task}
-            viewMode="kanban"
-            late={isLateTask(task.id)}
-            onDelete={onDelete}
-            onEdit={onEdit}
-            onStartFocus={onStartFocus}
-            onToggleComplete={onToggleComplete}
-            onMoveStatus={onMoveStatusTask}
-          />
-        ))}
-      </KanbanColumn>
+    <section
+      aria-label="Quadro de tarefas em formato kanban"
+      aria-live="polite"
+      className="grid grid-cols-3 gap-6 h-full min-h-0 overflow-hidden"
+    >
+      {/* PENDENTE */}
+      <div role="region" aria-labelledby="kanban-pending-title">
+        <KanbanColumn
+          title="PENDENTE"
+          count={pending.length}
+          color="muted-light"
+        >
+          <ul
+            className="space-y-2"
+            role="list"
+            aria-labelledby="kanban-pending-title"
+          >
+            {pending.map((task) => (
+              <li key={task.id}>
+                <TaskCard
+                  task={task}
+                  viewMode="kanban"
+                  late={isLateTask(task.id)}
+                  onDelete={onDelete}
+                  onEdit={onEdit}
+                  onStartFocus={onStartFocus}
+                  onToggleComplete={onToggleComplete}
+                  onMoveStatus={onMoveStatusTask}
+                />
+              </li>
+            ))}
+          </ul>
+        </KanbanColumn>
+      </div>
 
-      <KanbanColumn
-        title="EM PROGRESSO"
-        count={inProgress.length}
-        color="warning"
-      >
-        {inProgress.map((task) => (
-          <TaskCard
-            key={task.id}
-            task={task}
-            viewMode="kanban"
-            late={isLateTask(task.id)}
-            onDelete={onDelete}
-            onEdit={onEdit}
-            onStartFocus={onStartFocus}
-            onToggleComplete={onToggleComplete}
-            onMoveStatus={onMoveStatusTask}
-          />
-        ))}
-      </KanbanColumn>
+      {/* EM PROGRESSO */}
+      <div role="region" aria-labelledby="kanban-progress-title">
+        <KanbanColumn
+          title="EM PROGRESSO"
+          count={inProgress.length}
+          color="warning"
+        >
+          <ul
+            className="space-y-2"
+            role="list"
+            aria-labelledby="kanban-progress-title"
+          >
+            {inProgress.map((task) => (
+              <li key={task.id}>
+                <TaskCard
+                  task={task}
+                  viewMode="kanban"
+                  late={isLateTask(task.id)}
+                  onDelete={onDelete}
+                  onEdit={onEdit}
+                  onStartFocus={onStartFocus}
+                  onToggleComplete={onToggleComplete}
+                  onMoveStatus={onMoveStatusTask}
+                />
+              </li>
+            ))}
+          </ul>
+        </KanbanColumn>
+      </div>
 
-      <KanbanColumn title="CONCLUÍDO" count={done.length} color="success">
-        {done.map((task) => (
-          <TaskCard
-            key={task.id}
-            task={task}
-            viewMode="kanban"
-            onDelete={onDelete}
-            onEdit={onEdit}
-            onStartFocus={onStartFocus}
-            onToggleComplete={onToggleComplete}
-            onMoveStatus={onMoveStatusTask}
-          />
-        ))}
-      </KanbanColumn>
-    </div>
+      {/* CONCLUÍDO */}
+      <div role="region" aria-labelledby="kanban-done-title">
+        <KanbanColumn title="CONCLUÍDO" count={done.length} color="success">
+          <ul
+            className="space-y-2"
+            role="list"
+            aria-labelledby="kanban-done-title"
+          >
+            {done.map((task) => (
+              <li key={task.id}>
+                <TaskCard
+                  task={task}
+                  viewMode="kanban"
+                  onDelete={onDelete}
+                  onEdit={onEdit}
+                  onStartFocus={onStartFocus}
+                  onToggleComplete={onToggleComplete}
+                  onMoveStatus={onMoveStatusTask}
+                />
+              </li>
+            ))}
+          </ul>
+        </KanbanColumn>
+      </div>
+    </section>
   );
 }

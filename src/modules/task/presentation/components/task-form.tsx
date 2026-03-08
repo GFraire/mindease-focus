@@ -62,7 +62,6 @@ export function TaskForm({
     }
 
     setErrors(newErrors);
-
     return Object.keys(newErrors).length === 0;
   }
 
@@ -78,17 +77,9 @@ export function TaskForm({
       if (key === "when") {
         const when = value as WhenToDo;
 
-        if (when === "today") {
-          return { ...prev, when, date: new Date() };
-        }
-
-        if (when === "tomorrow") {
-          return { ...prev, when, date: addDays(1) };
-        }
-
-        if (when === "custom") {
-          return { ...prev, when };
-        }
+        if (when === "today") return { ...prev, when, date: new Date() };
+        if (when === "tomorrow") return { ...prev, when, date: addDays(1) };
+        if (when === "custom") return { ...prev, when };
       }
 
       return { ...prev, [key]: value };
@@ -101,9 +92,9 @@ export function TaskForm({
     setValues((prev) => ({ ...prev, subtasks: updated }));
   }
 
-  function handleSubmit() {
+  function handleSubmit(e?: React.FormEvent) {
+    e?.preventDefault();
     if (!validate()) return;
-
     onSubmit(values);
   }
 
@@ -112,19 +103,30 @@ export function TaskForm({
   }
 
   return (
-    <div className="w-full max-w-lg space-y-6 rounded-md bg-card p-6 shadow relative">
-      <div className="flex flex-col gap-1 items-center">
-        <Undo2
-          className="absolute left-6 top-6 cursor-pointer"
+    <form
+      onSubmit={handleSubmit}
+      aria-labelledby="task-form-title"
+      className="w-full max-w-lg space-y-6 rounded-md bg-card p-6 shadow relative"
+    >
+      <header className="flex flex-col gap-1 items-center">
+        <button
+          type="button"
+          aria-label="Voltar para a página anterior"
           onClick={goBack}
-        />
+          className="absolute cursor-pointer left-6 top-6"
+        >
+          <Undo2 aria-hidden="true" />
+        </button>
 
-        <h1 className="text-heading-lg font-bold text-high-contrast">
+        <h1
+          id="task-form-title"
+          className="text-heading-lg font-bold text-high-contrast"
+        >
           {title}
         </h1>
 
         <p className="text-body text-muted">{subtitle}</p>
-      </div>
+      </header>
 
       {/* Título */}
       <TextInput
@@ -132,14 +134,16 @@ export function TaskForm({
         placeholder="Ex: Estudar matemática"
         value={values.title}
         error={errors.title}
+        aria-invalid={!!errors.title}
+        aria-describedby={errors.title ? "title-error" : undefined}
         onChange={(e) => update("title", e.target.value)}
       />
 
       {/* Subtarefas */}
-      <div className="flex flex-col gap-2">
-        <span className="text-body-lg text-high-contrast font-bold mb-1">
+      <fieldset className="flex flex-col gap-2">
+        <legend className="text-body-lg text-high-contrast font-bold mb-1">
           Sub-tarefas (máximo 3)
-        </span>
+        </legend>
 
         {values.subtasks.map((subtask, i) => (
           <SubtaskInput
@@ -150,22 +154,26 @@ export function TaskForm({
             onChange={(val) => updateSubtask(i, val)}
           />
         ))}
-      </div>
+      </fieldset>
 
       {/* Energia */}
-      <div className="flex flex-col gap-3">
-        <div className="flex flex-col gap-1">
-          <span className="text-body-lg text-high-contrast font-bold">
-            Nível de energia necessário
-          </span>
+      <fieldset className="flex flex-col gap-3">
+        <legend className="text-body-lg text-high-contrast font-bold">
+          Nível de energia necessário
+        </legend>
 
-          <span className="text-muted text-body-sm">
-            Quanto de esforço essa tarefa pede de você agora?
-          </span>
-        </div>
+        <p className="text-muted text-body-sm">
+          Quanto de esforço essa tarefa pede de você agora?
+        </p>
 
-        <div className="flex gap-2">
+        <div
+          role="radiogroup"
+          aria-label="Nível de energia necessário"
+          className="flex gap-2"
+        >
           <SelectButton
+            role="radio"
+            aria-checked={values.energy === "low"}
             selected={values.energy === "low"}
             onClick={() => update("energy", "low")}
           >
@@ -173,6 +181,8 @@ export function TaskForm({
           </SelectButton>
 
           <SelectButton
+            role="radio"
+            aria-checked={values.energy === "medium"}
             selected={values.energy === "medium"}
             onClick={() => update("energy", "medium")}
           >
@@ -180,28 +190,34 @@ export function TaskForm({
           </SelectButton>
 
           <SelectButton
+            role="radio"
+            aria-checked={values.energy === "high"}
             selected={values.energy === "high"}
             onClick={() => update("energy", "high")}
           >
             Alta
           </SelectButton>
         </div>
-      </div>
+      </fieldset>
 
       {/* Quando */}
-      <div className="flex flex-col gap-3">
-        <div className="flex flex-col gap-1">
-          <span className="text-body-lg text-high-contrast font-bold">
-            Quando realizar?
-          </span>
+      <fieldset className="flex flex-col gap-3">
+        <legend className="text-body-lg text-high-contrast font-bold">
+          Quando realizar?
+        </legend>
 
-          <span className="text-muted text-body-sm">
-            Defina uma data para manter o foco.
-          </span>
-        </div>
+        <p className="text-muted text-body-sm">
+          Defina uma data para manter o foco.
+        </p>
 
-        <div className="flex gap-2">
+        <div
+          role="radiogroup"
+          aria-label="Quando realizar a tarefa"
+          className="flex gap-2"
+        >
           <SelectButton
+            role="radio"
+            aria-checked={values.when === "today"}
             selected={values.when === "today"}
             onClick={() => update("when", "today")}
           >
@@ -209,6 +225,8 @@ export function TaskForm({
           </SelectButton>
 
           <SelectButton
+            role="radio"
+            aria-checked={values.when === "tomorrow"}
             selected={values.when === "tomorrow"}
             onClick={() => update("when", "tomorrow")}
           >
@@ -216,11 +234,13 @@ export function TaskForm({
           </SelectButton>
 
           <SelectButton
+            role="radio"
+            aria-checked={values.when === "custom"}
             selected={values.when === "custom"}
             onClick={() => update("when", "custom")}
           >
             <span className="flex gap-2 items-center">
-              <Calendar className="h-5 w-5" />
+              <Calendar className="h-5 w-5" aria-hidden="true" />
               Outra data
             </span>
           </SelectButton>
@@ -233,24 +253,28 @@ export function TaskForm({
             disabled={{ before: addDays(2) }}
           />
         )}
-      </div>
+      </fieldset>
 
       {/* Duração */}
-      <div className="flex flex-col gap-3">
-        <div className="flex flex-col gap-1">
-          <span className="text-body-lg text-high-contrast font-bold">
-            Duração de cada bloco de foco
-          </span>
+      <fieldset className="flex flex-col gap-3">
+        <legend className="text-body-lg text-high-contrast font-bold">
+          Duração de cada bloco de foco
+        </legend>
 
-          <span className="text-muted text-body-sm">
-            Escolha quanto tempo você quer manter o foco sem interrupções.
-          </span>
-        </div>
+        <p className="text-muted text-body-sm">
+          Escolha quanto tempo você quer manter o foco sem interrupções.
+        </p>
 
-        <div className="flex gap-2">
+        <div
+          role="radiogroup"
+          aria-label="Duração do bloco de foco"
+          className="flex gap-2"
+        >
           {[15, 30, 45, 60].map((duration) => (
             <SelectButton
               key={duration}
+              role="radio"
+              aria-checked={values.focusDuration === duration}
               selected={values.focusDuration === duration}
               onClick={() => update("focusDuration", duration as FocusDuration)}
             >
@@ -258,16 +282,15 @@ export function TaskForm({
             </SelectButton>
           ))}
         </div>
-      </div>
+      </fieldset>
 
       <div className="flex flex-col gap-4">
         <BaseButton
           className="w-full text-white! cursor-pointer"
           type="submit"
           loading={isLoading}
-          onClick={handleSubmit}
         >
-          <CircleCheck />
+          <CircleCheck aria-hidden="true" />
           {submitLabel}
         </BaseButton>
 
@@ -280,6 +303,6 @@ export function TaskForm({
           Cancelar
         </BaseButton>
       </div>
-    </div>
+    </form>
   );
 }

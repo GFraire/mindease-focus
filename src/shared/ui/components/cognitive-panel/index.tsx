@@ -9,6 +9,7 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/shared/ui/components/ui/sheet";
+
 import { useCognitiveSettingsStore } from "../../store/cognitive-settings-store";
 import { SelectButton } from "../form/select-button";
 
@@ -33,13 +34,24 @@ export function CognitivePanel({ open, onOpenChange }: CognitivePanelProps) {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="min-w-95 sm:min-w-105 p-6">
+      <SheetContent
+        side="right"
+        className="min-w-95 sm:min-w-105 p-6"
+        aria-labelledby="cognitive-panel-title"
+        aria-describedby="cognitive-panel-description"
+      >
         <SheetHeader className="p-0">
-          <SheetTitle className="text-heading text-high-contrast font-bold">
+          <SheetTitle
+            id="cognitive-panel-title"
+            className="text-heading text-high-contrast font-bold"
+          >
             Painel de controle cognitivo
           </SheetTitle>
 
-          <SheetDescription className="text-body-sm text-muted">
+          <SheetDescription
+            id="cognitive-panel-description"
+            className="text-body-sm text-muted"
+          >
             Personalize sua experiência para reduzir o esforço mental.
           </SheetDescription>
         </SheetHeader>
@@ -48,10 +60,14 @@ export function CognitivePanel({ open, onOpenChange }: CognitivePanelProps) {
 
         <div className="space-y-8">
           {/* Nível de energia */}
-          <section className="space-y-2">
+          <section className="space-y-2" aria-labelledby="energy-title">
             <div className="flex items-center gap-2">
-              <Zap className="h-5 w-5 text-primary" />
-              <h3 className="text-body-lg text-high-contrast font-bold">
+              <Zap className="h-5 w-5 text-primary" aria-hidden="true" />
+
+              <h3
+                id="energy-title"
+                className="text-body-lg text-high-contrast font-bold"
+              >
                 Nível de energia
               </h3>
             </div>
@@ -60,8 +76,14 @@ export function CognitivePanel({ open, onOpenChange }: CognitivePanelProps) {
               Como você se sente agora? Ajuste conforme sua disposição.
             </p>
 
-            <div className="flex gap-2">
+            <div
+              role="radiogroup"
+              aria-label="Selecione seu nível de energia"
+              className="flex gap-2"
+            >
               <SelectButton
+                role="radio"
+                aria-checked={energy === "low"}
                 selected={energy === "low"}
                 onClick={() => setEnergy("low")}
               >
@@ -69,6 +91,8 @@ export function CognitivePanel({ open, onOpenChange }: CognitivePanelProps) {
               </SelectButton>
 
               <SelectButton
+                role="radio"
+                aria-checked={energy === "medium"}
                 selected={energy === "medium"}
                 onClick={() => setEnergy("medium")}
               >
@@ -76,6 +100,8 @@ export function CognitivePanel({ open, onOpenChange }: CognitivePanelProps) {
               </SelectButton>
 
               <SelectButton
+                role="radio"
+                aria-checked={energy === "high"}
                 selected={energy === "high"}
                 onClick={() => setEnergy("high")}
               >
@@ -85,21 +111,34 @@ export function CognitivePanel({ open, onOpenChange }: CognitivePanelProps) {
           </section>
 
           {/* Ajustes visuais */}
-          <section className="space-y-4">
+          <section className="space-y-4" aria-labelledby="visual-title">
             <div className="flex items-center gap-2">
-              <Palette className="h-5 w-5 text-primary" />
-              <h3 className="text-body-lg font-bold text-high-contrast">
-                Ajustes Visuais
+              <Palette className="h-5 w-5 text-primary" aria-hidden="true" />
+
+              <h3
+                id="visual-title"
+                className="text-body-lg font-bold text-high-contrast"
+              >
+                Ajustes visuais
               </h3>
             </div>
 
             <div className="space-y-2">
-              <p className="text-body font-semibold text-high-contrast">
+              <p
+                id="font-size-label"
+                className="text-body font-semibold text-high-contrast"
+              >
                 Tamanho da fonte
               </p>
 
-              <div className="flex gap-2">
+              <div
+                role="radiogroup"
+                aria-labelledby="font-size-label"
+                className="flex gap-2"
+              >
                 <SelectButton
+                  role="radio"
+                  aria-checked={fontSize === "normal"}
                   selected={fontSize === "normal"}
                   onClick={() => setFontSize("normal")}
                 >
@@ -107,6 +146,8 @@ export function CognitivePanel({ open, onOpenChange }: CognitivePanelProps) {
                 </SelectButton>
 
                 <SelectButton
+                  role="radio"
+                  aria-checked={fontSize === "large"}
                   selected={fontSize === "large"}
                   onClick={() => setFontSize("large")}
                 >
@@ -114,6 +155,8 @@ export function CognitivePanel({ open, onOpenChange }: CognitivePanelProps) {
                 </SelectButton>
 
                 <SelectButton
+                  role="radio"
+                  aria-checked={fontSize === "extra"}
                   selected={fontSize === "extra"}
                   onClick={() => setFontSize("extra")}
                 >
@@ -124,7 +167,10 @@ export function CognitivePanel({ open, onOpenChange }: CognitivePanelProps) {
 
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-body font-semibold text-high-contrast">
+                <p
+                  id="dark-mode-label"
+                  className="text-body font-semibold text-high-contrast"
+                >
                   Tema escuro
                 </p>
 
@@ -136,24 +182,31 @@ export function CognitivePanel({ open, onOpenChange }: CognitivePanelProps) {
               <Switch
                 checked={darkMode}
                 onCheckedChange={toggleDarkMode}
+                aria-labelledby="dark-mode-label"
                 className="data-[state=unchecked]:bg-muted-light data-[state=unchecked]:border data-[state=unchecked]:border-border"
               />
             </div>
           </section>
 
           {/* Estímulos sensoriais */}
-          <section className="space-y-4">
+          <section className="space-y-4" aria-labelledby="stimulus-title">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
+              <Sparkles className="h-5 w-5 text-primary" aria-hidden="true" />
 
-              <h3 className="text-body-lg font-bold text-high-contrast">
+              <h3
+                id="stimulus-title"
+                className="text-body-lg font-bold text-high-contrast"
+              >
                 Estímulos sensoriais
               </h3>
             </div>
 
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-high-contrast font-semibold text-body">
+                <p
+                  id="reduce-animations-label"
+                  className="text-high-contrast font-semibold text-body"
+                >
                   Reduzir animações
                 </p>
 
@@ -165,13 +218,17 @@ export function CognitivePanel({ open, onOpenChange }: CognitivePanelProps) {
               <Switch
                 checked={reduceAnimations}
                 onCheckedChange={toggleReduceAnimations}
+                aria-labelledby="reduce-animations-label"
                 className="data-[state=unchecked]:bg-muted-light data-[state=unchecked]:border data-[state=unchecked]:border-border"
               />
             </div>
 
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-high-contrast font-semibold text-body">
+                <p
+                  id="mute-notifications-label"
+                  className="text-high-contrast font-semibold text-body"
+                >
                   Silenciar notificações
                 </p>
 
@@ -183,6 +240,7 @@ export function CognitivePanel({ open, onOpenChange }: CognitivePanelProps) {
               <Switch
                 checked={muteNotifications}
                 onCheckedChange={toggleMuteNotifications}
+                aria-labelledby="mute-notifications-label"
                 className="data-[state=unchecked]:bg-muted-light data-[state=unchecked]:border data-[state=unchecked]:border-border"
               />
             </div>

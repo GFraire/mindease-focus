@@ -22,6 +22,8 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
     ref,
   ) {
     const inputId = id ?? useId();
+    const errorId = `${inputId}-error`;
+
     const [showPassword, setShowPassword] = useState(false);
 
     const isPassword = type === "password";
@@ -37,9 +39,13 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           </label>
         )}
 
-        <div className="relative flex flex-col gap-0.5">
+        {/* wrapper apenas do input */}
+        <div className="relative">
           {leftIcon && (
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-light pointer-events-none">
+            <span
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-light pointer-events-none"
+              aria-hidden="true"
+            >
               {leftIcon}
             </span>
           )}
@@ -48,6 +54,8 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
             ref={ref}
             id={inputId}
             type={isPassword ? (showPassword ? "text" : "password") : type}
+            aria-invalid={!!error}
+            aria-describedby={error ? errorId : undefined}
             className={cn(
               "border-border rounded-md text-high-contrast placeholder:text-muted-light py-5",
               isPassword && "pr-10",
@@ -62,15 +70,20 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
             <button
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute right-3 top-[50%] -translate-y-[50%] text-muted-light hover:text-high-contrast"
-              tabIndex={-1}
+              aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-light hover:text-high-contrast"
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           )}
-
-          {error && <span className="text-sm text-red-500">{error}</span>}
         </div>
+
+        {/* erro separado */}
+        {error && (
+          <span id={errorId} className="text-sm text-red-500">
+            {error}
+          </span>
+        )}
       </div>
     );
   },

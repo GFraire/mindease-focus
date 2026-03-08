@@ -46,6 +46,8 @@ export function TaskCard({
   onBringToToday,
   onMoveStatus,
 }: TaskCardProps) {
+  const titleId = `task-title-${task.id}`;
+
   const statusOptions = [];
 
   if (viewMode === "kanban" && onMoveStatus) {
@@ -74,7 +76,10 @@ export function TaskCard({
   }
 
   return (
-    <div className="flex items-center justify-between rounded-lg border border-border bg-card p-4">
+    <article
+      aria-labelledby={titleId}
+      className="flex items-center justify-between rounded-lg border border-border bg-card p-4"
+    >
       <div
         className={cn(
           "flex items-center gap-4",
@@ -85,6 +90,12 @@ export function TaskCard({
         <Checkbox
           className="cursor-pointer h-5 w-5 border-muted-light"
           checked={task.completed}
+          aria-labelledby={titleId}
+          aria-label={
+            task.completed
+              ? `Marcar tarefa ${task.title} como pendente`
+              : `Concluir tarefa ${task.title}`
+          }
           onCheckedChange={(checked) =>
             onToggleComplete(task.id, Boolean(checked))
           }
@@ -92,6 +103,7 @@ export function TaskCard({
 
         <div className="flex flex-col gap-1">
           <span
+            id={titleId}
             className={`text-body font-bold text-high-contrast ${
               task.completed && "line-through opacity-50"
             }`}
@@ -99,10 +111,18 @@ export function TaskCard({
             {task.title}
           </span>
 
-          <div className="flex items-center gap-4 text-xs text-muted">
+          <div
+            className="flex items-center gap-4 text-xs text-muted"
+            role="group"
+            aria-label="Informações da tarefa"
+          >
             {late && (
-              <div className="flex gap-2 items-center bg-muted/15! py-0.5 px-2 rounded-full">
-                <Clock className="text-muted" size={16} />
+              <div
+                className="flex gap-2 items-center bg-muted/15! py-0.5 px-2 rounded-full"
+                role="status"
+                aria-label="Tarefa atrasada"
+              >
+                <Clock className="text-muted" size={16} aria-hidden="true" />
 
                 <span className="text-muted font-semibold text-body-sm">
                   ATRASADA
@@ -110,20 +130,26 @@ export function TaskCard({
               </div>
             )}
 
-            <div className="flex items-center gap-1 text-body-sm text-muted">
-              <Timer className="h-4 w-4" />
+            <div
+              className="flex items-center gap-1 text-body-sm text-muted"
+              aria-label={`Duração de foco ${task.focusDuration} minutos`}
+            >
+              <Timer className="h-4 w-4" aria-hidden="true" />
               {task.focusDuration}m
             </div>
 
             <div
               className={cn(
-                "flex items-center gap-1 rounded-sm border px-2 py-1 font-bold  bg-transparent",
+                "flex items-center gap-1 rounded-sm border px-2 py-1 font-bold bg-transparent",
                 task.energy === "high" && "border-error text-error",
                 task.energy === "medium" && "border-warning text-warning",
                 task.energy === "low" && "border-info text-info",
               )}
+              aria-label={`Nível de energia necessário: ${getEnergyLabel(
+                task.energy,
+              )}`}
             >
-              <Zap className="h-4 w-4" />
+              <Zap className="h-4 w-4" aria-hidden="true" />
               <span className="text-body-sm">
                 Energia: {getEnergyLabel(task.energy)}
               </span>
@@ -134,26 +160,41 @@ export function TaskCard({
 
       <div className="flex gap-2">
         {late && onBringToToday && (
-          <ChevronsDown
-            className="text-primary cursor-pointer hover:opacity-80"
-            size={24}
+          <button
+            aria-label={`Trazer tarefa ${task.title} para hoje`}
+            className="text-primary cursor-pointer hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-primary rounded"
             onClick={() => onBringToToday(task.id)}
-          />
+          >
+            <ChevronsDown aria-hidden="true" size={24} />
+          </button>
         )}
 
         <DropdownMenu>
-          <DropdownMenuTrigger className="text-muted hover:text-high-contrast">
-            <MoreVertical className="cursor-pointer" size={20} />
+          <DropdownMenuTrigger
+            className="text-muted hover:text-high-contrast focus:outline-none focus:ring-2 focus:ring-primary rounded"
+            aria-label={`Abrir ações da tarefa ${task.title}`}
+          >
+            <MoreVertical
+              aria-hidden="true"
+              className="cursor-pointer"
+              size={20}
+            />
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent
+            align="end"
+            aria-label={`Menu de ações da tarefa ${task.title}`}
+          >
             {statusOptions.map((option) => (
               <DropdownMenuItem
                 key={option.status}
                 className="cursor-pointer"
-                onClick={() => onMoveStatus?.(task.id, option.status as TaskStatus)}
+                onClick={() =>
+                  onMoveStatus?.(task.id, option.status as TaskStatus)
+                }
+                aria-label={`${option.label} para tarefa ${task.title}`}
               >
-                <ArrowLeftRight className="mr-1 h-4 w-4" />
+                <ArrowLeftRight className="mr-1 h-4 w-4" aria-hidden="true" />
                 {option.label}
               </DropdownMenuItem>
             ))}
@@ -161,29 +202,35 @@ export function TaskCard({
             <DropdownMenuItem
               className="cursor-pointer"
               onClick={() => onEdit(task)}
+              aria-label={`Editar tarefa ${task.title}`}
             >
-              <Pencil className="mr-1 h-4 w-4" />
+              <Pencil className="mr-1 h-4 w-4" aria-hidden="true" />
               Editar detalhes
             </DropdownMenuItem>
 
             <DropdownMenuItem
               className="cursor-pointer"
               onClick={() => onStartFocus(task)}
+              aria-label={`Iniciar foco na tarefa ${task.title}`}
             >
-              <Play className="mr-1 h-4 w-4" />
+              <Play className="mr-1 h-4 w-4" aria-hidden="true" />
               Iniciar foco
             </DropdownMenuItem>
 
             <DropdownMenuItem
               className="text-red-500 focus:text-red-500 cursor-pointer"
               onClick={() => onDelete(task.id)}
+              aria-label={`Excluir tarefa ${task.title}`}
             >
-              <Trash2 className="mr-1 h-4 w-4 text-red-500" />
+              <Trash2
+                className="mr-1 h-4 w-4 text-red-500"
+                aria-hidden="true"
+              />
               Excluir tarefa
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </div>
+    </article>
   );
 }

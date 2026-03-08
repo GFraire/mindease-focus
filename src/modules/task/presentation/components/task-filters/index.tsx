@@ -22,19 +22,30 @@ export function TaskFilters({
   onDateChange,
 }: TaskFiltersProps) {
   return (
-    <div className="flex flex-col gap-4">
+    <section
+      aria-labelledby="task-filters-title"
+      className="flex flex-col gap-4"
+    >
+      <h2 id="task-filters-title" className="sr-only">
+        Filtros de tarefas
+      </h2>
+
       <TextInput
+        label="Buscar tarefa"
         placeholder="Procurar tarefa..."
-        leftIcon={<Search size={18} />}
+        leftIcon={<Search size={18} aria-hidden="true" />}
         value={search}
+        aria-label="Buscar tarefas pelo título"
         onChange={(e) => onSearchChange(e.target.value)}
       />
 
-      <DateFilter
-        value={dateFilter}
-        customDate={customDate}
-        onChange={onDateChange}
-      />
-    </div>
+      <div aria-label="Filtro de data das tarefas">
+        <DateFilter
+          value={dateFilter}
+          customDate={customDate}
+          onChange={onDateChange}
+        />
+      </div>
+    </section>
   );
 }

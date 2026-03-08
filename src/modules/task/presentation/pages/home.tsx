@@ -20,6 +20,7 @@ import type { Task } from "../../domain/entities/task";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Separator } from "@/shared/ui/components/ui/separator";
+import { BaseButton } from "@/shared/ui/components/form/base-button";
 
 export function Home() {
   const listTasksByDateUseCase = useMemo(
@@ -44,6 +45,7 @@ export function Home() {
   const [focusTask, setFocusTask] = useState<Task | null>(null);
   const [nextTasks, setNextTasks] = useState<Task[]>([]);
   const [lateTasksCount, setLateTasksCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     reloadTasks();
@@ -88,6 +90,8 @@ export function Home() {
       toast.error("Erro ao carregar tarefas", {
         position: "bottom-center",
       });
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -161,44 +165,75 @@ export function Home() {
 
   const hasTasks = focusTask || nextTasks.length > 0;
 
+  if (isLoading) {
+    return (
+      <div className="flex h-full w-full">
+        <Sidebar />
+
+        <main className="w-full flex items-center justify-center">
+          <span className="text-muted text-body">Carregando tarefas...</span>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-full w-full">
       <Sidebar />
 
-      <div className="w-full flex flex-col p-8 gap-6">
-        <div className="flex flex-col gap-3">
+      <main
+        className="w-full flex flex-col p-8 gap-6"
+        aria-labelledby="home-heading"
+      >
+        <header className="flex flex-col gap-3">
           <div className="flex flex-col gap-1">
-            <h1 className="text-heading-lg font-bold text-high-contrast">
+            <h1
+              id="home-heading"
+              className="text-heading-lg font-bold text-high-contrast"
+            >
               Olá, como você está hoje?
             </h1>
 
-            <span className="text-body text-muted">
+            <p className="text-body text-muted">
               Aqui está o seu foco para este momento.
-            </span>
+            </p>
           </div>
 
           {lateTasksCount > 0 && (
-            <div className="flex items-center justify-between bg-warning/10 border border-warning/30 rounded-lg px-4 py-3">
+            <div
+              role="alert"
+              aria-live="polite"
+              className="flex items-center justify-between bg-warning/10 border border-warning/30 rounded-lg px-4 py-3"
+            >
               <span className="flex gap-2 items-center text-sm text-warning font-medium">
-                <AlertTriangle size={18} />
+                <AlertTriangle size={18} aria-hidden="true" />
                 Você tem {lateTasksCount} tarefa
                 {lateTasksCount > 1 && "s"} atrasada
                 {lateTasksCount > 1 && "s"}
               </span>
 
-              <button
+              <BaseButton
                 onClick={() => navigate("/tasks")}
-                className="text-sm font-semibold text-warning cursor-pointer hover:underline"
+                variant="link"
+                aria-label="Ver lista de tarefas atrasadas"
+                className="text-body-sm font-semibold text-warning cursor-pointer! focus:outline-none focus:ring-2 focus:ring-warning"
               >
                 Ver tarefas
-              </button>
+              </BaseButton>
             </div>
           )}
-        </div>
+        </header>
 
         {!hasTasks && (
-          <div className="flex flex-col items-center justify-center gap-2 p-12 border border-border rounded-md bg-card h-full">
-            <ClipboardList size={32} className="text-muted" />
+          <section
+            aria-label="Nenhuma tarefa para hoje"
+            className="flex flex-col items-center justify-center gap-2 p-12 border border-border rounded-md bg-card h-full"
+          >
+            <ClipboardList
+              size={32}
+              className="text-muted"
+              aria-hidden="true"
+            />
 
             <span className="font-semibold text-high-contrast">
               Nenhuma tarefa para hoje
@@ -210,42 +245,54 @@ export function Home() {
 
             <button
               onClick={() => navigate("/create-task")}
-              className="text-sm font-semibold text-primary cursor-pointer hover:underline"
+              aria-label="Criar nova tarefa"
+              className="text-sm font-semibold text-primary cursor-pointer hover:underline focus:outline-none focus:ring-2 focus:ring-primary"
             >
               Criar nova tarefa
             </button>
-          </div>
+          </section>
         )}
 
         {focusTask && (
-          <FocusNowCard
-            task={focusTask}
-            onStart={handleStartFocus}
-            onEdit={handleEditTask}
-            onDelete={handleDeleteTask}
-            onToggleComplete={handleToggleCompleted}
-          />
+          <section aria-labelledby="focus-task-heading">
+            <FocusNowCard
+              task={focusTask}
+              onStart={handleStartFocus}
+              onEdit={handleEditTask}
+              onDelete={handleDeleteTask}
+              onToggleComplete={handleToggleCompleted}
+            />
+          </section>
         )}
 
         {focusTask && (
-          <div className="flex flex-col gap-4 flex-1">
-            <div className="flex justify-between">
-              <h2 className="text-heading font-bold text-high-contrast">
+          <section className="flex flex-col gap-4 flex-1">
+            <div className="flex justify-between items-center">
+              <h2
+                id="next-tasks-heading"
+                className="text-heading font-bold text-high-contrast"
+              >
                 Próximas tarefas
               </h2>
 
-              <span
-                className="text-primary font-semibold text-body-sm cursor-pointer hover:underline"
+              <BaseButton
                 onClick={() => navigate("/tasks")}
+                aria-label="Ver todas as tarefas"
+                variant="link"
+                className="text-primary! font-semibold text-body-sm cursor-pointer hover:underline focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 Ver todas
-              </span>
+              </BaseButton>
             </div>
 
-            <Separator  />
+            <Separator className="mb-2" />
 
             {nextTasks.length > 0 ? (
-              <div className="flex flex-col gap-2">
+              <div
+                role="list"
+                aria-labelledby="next-tasks-heading"
+                className="flex flex-col gap-2"
+              >
                 {nextTasks.map((task) => (
                   <TaskCard
                     key={task.id}
@@ -258,8 +305,15 @@ export function Home() {
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center flex-1 gap-2 py-6 rounded-md border border-border bg-card">
-                <ClipboardList size={20} className="text-muted" />
+              <div
+                className="flex flex-col items-center justify-center flex-1 gap-2 py-6 rounded-md border border-border bg-card"
+                aria-live="polite"
+              >
+                <ClipboardList
+                  size={20}
+                  className="text-muted"
+                  aria-hidden="true"
+                />
 
                 <span className="text-body text-muted">
                   Nenhuma outra tarefa pendente agora
@@ -270,9 +324,9 @@ export function Home() {
                 </span>
               </div>
             )}
-          </div>
+          </section>
         )}
-      </div>
+      </main>
     </div>
   );
 }
