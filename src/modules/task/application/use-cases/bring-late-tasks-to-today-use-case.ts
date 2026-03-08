@@ -1,7 +1,7 @@
 import { formatDateIsoString } from "@/shared/utils/date/date-helper";
 import type { TaskRepository } from "../../domain/repositories/task-repository";
 
-export class BringPendingTasksToTodayUseCase {
+export class BringLateTasksToTodayUseCase {
   private tasksRepository: TaskRepository;
 
   constructor(tasksRepository: TaskRepository) {

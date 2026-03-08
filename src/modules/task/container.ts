@@ -1,9 +1,10 @@
-import { BringPendingTasksToTodayUseCase } from "./application/use-cases/bring-pending-tasks-to-today-use-case";
+import { BringLateTasksToTodayUseCase } from "./application/use-cases/bring-late-tasks-to-today-use-case";
 import { CreateTaskUseCase } from "./application/use-cases/create-task-use-case";
 import { DeleteTaskUseCase } from "./application/use-cases/delete-task-use-case";
 import { GetTaskByIdUseCase } from "./application/use-cases/get-task-by-id-use-case";
-import { ListPendingTasksUseCase } from "./application/use-cases/list-pending-tasks-use-case";
+import { ListLateTasksUseCase } from "./application/use-cases/list-late-tasks-use-case";
 import { ListTasksByDateUseCase } from "./application/use-cases/list-tasks-by-date-use-case";
+import { MoveTaskStatusUseCase } from "./application/use-cases/move-task-status-use-case";
 import { ToggleTaskCompletedUseCase } from "./application/use-cases/toggle-task-completed-use-case";
 import { UpdateTaskUseCase } from "./application/use-cases/update-task-use-case";
 import { FirebaseTaskRepository } from "./infrastructure/firebase/firebase-task-repository";
@@ -20,16 +21,16 @@ export function makeListTasksByDateUseCase() {
   return new ListTasksByDateUseCase(repository);
 }
 
-export function makeListPendingTasksUseCase() {
+export function makeListLateTasksUseCase() {
   const repository = new FirebaseTaskRepository();
 
-  return new ListPendingTasksUseCase(repository);
+  return new ListLateTasksUseCase(repository);
 }
 
-export function makeBringPendingTasksToTodayUseCase() {
+export function makeBringLateTasksToTodayUseCase() {
   const repository = new FirebaseTaskRepository();
 
-  return new BringPendingTasksToTodayUseCase(repository);
+  return new BringLateTasksToTodayUseCase(repository);
 }
 
 export function makeDeleteTaskUseCase() {
@@ -54,4 +55,10 @@ export function makeToggleTaskCompletedUseCase() {
   const repository = new FirebaseTaskRepository();
 
   return new ToggleTaskCompletedUseCase(repository);
+}
+
+export function makeMoveTaskStatusUseCase() {
+  const repository = new FirebaseTaskRepository();
+
+  return new MoveTaskStatusUseCase(repository);
 }

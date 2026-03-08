@@ -15,10 +15,10 @@ type Props = {
   customDate: Date;
   loading: boolean;
   dateTasks: Task[];
-  filteredPendingTasks: Task[];
+  filteredLateTasks: Task[];
   filteredDateTasks: Task[];
   bringingToToday: boolean;
-  showPendingTasks: boolean;
+  showLateTasks: boolean;
   showDateTasks: boolean;
   onBringAllToToday: () => void;
   onBringToToday: (taskId: string) => void;
@@ -33,10 +33,10 @@ export function TaskListView({
   customDate,
   loading,
   dateTasks,
-  filteredPendingTasks,
+  filteredLateTasks,
   filteredDateTasks,
   bringingToToday,
-  showPendingTasks,
+  showLateTasks,
   showDateTasks,
   onBringAllToToday,
   onBringToToday,
@@ -46,15 +46,15 @@ export function TaskListView({
   onToggleComplete,
 }: Props) {
   return (
-    <div className="overflow-auto h-full flex flex-col">
-      {showPendingTasks && (
+    <div className="overflow-auto h-full flex flex-col gap-6">
+      {showLateTasks && (
         <div className="flex flex-col gap-4">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-2">
               <History className="text-muted" />
 
               <span className="text-muted font-semibold text-body">
-                TAREFAS PENDENTES
+                TAREFAS ATRASADAS
               </span>
 
               {loading && (
@@ -79,10 +79,10 @@ export function TaskListView({
           </div>
 
           <div className="flex flex-col gap-2">
-            {filteredPendingTasks.map((task) => (
+            {filteredLateTasks.map((task) => (
               <TaskCard
                 key={task.id}
-                pending
+                late
                 task={task}
                 onBringToToday={onBringToToday}
                 onDelete={onDelete}

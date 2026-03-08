@@ -14,3 +14,19 @@ export function sortTasksByEnergy(tasks: Task[], userEnergy: EnergyLevel) {
     (a, b) => order.indexOf(a.energy) - order.indexOf(b.energy),
   );
 }
+
+export function sortTasksByCompleted(tasks: Task[]) {
+  return [...tasks].sort((a, b) => {
+    if (a.completed === b.completed) return 0;
+    return a.completed ? 1 : -1;
+  });
+}
+
+export function sortTasksByStatusAndEnergy(
+  tasks: Task[],
+  userEnergy: EnergyLevel,
+) {
+  const sortedByEnergy = sortTasksByEnergy(tasks, userEnergy);
+
+  return sortTasksByCompleted(sortedByEnergy);
+}

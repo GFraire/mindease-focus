@@ -41,7 +41,7 @@ export class FirebaseTaskRepository implements TaskRepository {
     })) as Task[];
   }
 
-  async findPendingTasks(userId: string, beforeDate: string) {
+  async findLateTasks(userId: string, beforeDate: string) {
     const q = query(
       collection(db, "tasks"),
       where("userId", "==", userId),

@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { ListPendingTasksUseCase } from "../list-pending-tasks-use-case";
+import { ListLateTasksUseCase } from "../list-late-tasks-use-case";
 import { formatDateIsoString } from "@/shared/utils/date/date-helper";
 import type { TaskRepository } from "../../../domain/repositories/task-repository";
 import type { Task } from "../../../domain/entities/task";
 
-describe("ListPendingTasksUseCase", () => {
+describe("ListLateTasksUseCase", () => {
   let taskRepository: TaskRepository;
 
-  let listPendingTasksUseCase: ListPendingTasksUseCase;
+  let listLateTasksUseCase: ListLateTasksUseCase;
 
   beforeEach(() => {
     taskRepository = {
@@ -15,14 +15,14 @@ describe("ListPendingTasksUseCase", () => {
       create: vi.fn(),
       delete: vi.fn(),
       findById: vi.fn(),
-      findPendingTasks: vi.fn(),
+      findLateTasks: vi.fn(),
       listByDate: vi.fn(),
     };
 
-    listPendingTasksUseCase = new ListPendingTasksUseCase(taskRepository);
+    listLateTasksUseCase = new ListLateTasksUseCase(taskRepository);
   });
 
-  it("should return pending tasks for today", async () => {
+  it("should return late tasks for today", async () => {
     const userId = "user-1";
 
     const tasks: Task[] = [
@@ -36,19 +36,19 @@ describe("ListPendingTasksUseCase", () => {
         scheduledFor: "2026-03-04",
         completed: false,
         createdAt: "2026-03-04",
-        inProgress: false
+        inProgress: false,
       },
     ];
 
-    vi.mocked(taskRepository.findPendingTasks).mockResolvedValue(tasks);
+    vi.mocked(taskRepository.findLateTasks).mockResolvedValue(tasks);
 
-    const result = await listPendingTasksUseCase.execute(userId);
+    const result = await listLateTasksUseCase.execute(userId);
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const todayFormatted = formatDateIsoString(today);
 
-    expect(taskRepository.findPendingTasks).toHaveBeenCalledWith(
+    expect(taskRepository.findLateTasks).toHaveBeenCalledWith(
       userId,
       todayFormatted,
     );
@@ -56,12 +56,12 @@ describe("ListPendingTasksUseCase", () => {
     expect(result).toEqual(tasks);
   });
 
-  it("should return empty array when there are no pending tasks", async () => {
+  it("should return empty array when there are no late tasks", async () => {
     const userId = "user-1";
 
-    vi.mocked(taskRepository.findPendingTasks).mockResolvedValue([]);
+    vi.mocked(taskRepository.findLateTasks).mockResolvedValue([]);
 
-    const result = await listPendingTasksUseCase.execute(userId);
+    const result = await listLateTasksUseCase.execute(userId);
 
     expect(result).toEqual([]);
   });

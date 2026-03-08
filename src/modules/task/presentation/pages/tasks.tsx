@@ -3,16 +3,20 @@ import { useNavigate } from "react-router-dom";
 import { Sidebar } from "@/shared/ui/components/sidebar";
 import { TaskFilters } from "../components/task-filters";
 import {
-  makeBringPendingTasksToTodayUseCase,
+  makeBringLateTasksToTodayUseCase,
   makeDeleteTaskUseCase,
-  makeListPendingTasksUseCase,
+  makeListLateTasksUseCase,
   makeListTasksByDateUseCase,
+  makeMoveTaskStatusUseCase,
   makeToggleTaskCompletedUseCase,
 } from "../../container";
 import { useAuthStore } from "@/shared/ui/store/auth-store";
 import type { Task } from "../../domain/entities/task";
 import { useCognitiveSettingsStore } from "@/shared/ui/store/cognitive-settings-store";
-import { sortTasksByEnergy } from "../utils/sort";
+import {
+  sortTasksByEnergy,
+  sortTasksByStatusAndEnergy,
+} from "../utils/sort-tasks";
 import { isToday } from "@/shared/utils/date/date-helper";
 import { toast } from "sonner";
 import { TaskListView } from "./task-list-view";
@@ -23,19 +27,21 @@ export type DateFilter = "today" | "tomorrow" | "custom";
 
 export type TaskViewMode = "list" | "kanban";
 
+export type TaskStatus = "pending" | "inProgress";
+
 export function Tasks() {
   const listTasksByDateUseCase = useMemo(
     () => makeListTasksByDateUseCase(),
     [],
   );
 
-  const listPendingTasksUseCase = useMemo(
-    () => makeListPendingTasksUseCase(),
+  const ListLateTasksUseCase = useMemo(
+    () => makeListLateTasksUseCase(),
     [],
   );
 
-  const bringPendingTasksToTodayUseCase = useMemo(
-    () => makeBringPendingTasksToTodayUseCase(),
+  const BringLateTasksToTodayUseCase = useMemo(
+    () => makeBringLateTasksToTodayUseCase(),
     [],
   );
 
@@ -43,6 +49,8 @@ export function Tasks() {
     () => makeToggleTaskCompletedUseCase(),
     [],
   );
+
+  const moveTaskStatusUseCase = useMemo(() => makeMoveTaskStatusUseCase(), []);
 
   const deleteTaskUseCase = useMemo(() => makeDeleteTaskUseCase(), []);
 
@@ -55,14 +63,14 @@ export function Tasks() {
   const [taskTitle, setTaskTitle] = useState("");
   const [dateFilter, setDateFilter] = useState<DateFilter>("today");
   const [customDate, setCustomDate] = useState<Date>(new Date());
-  const [pendingTasks, setPendingTasks] = useState<Task[]>([]);
+  const [lateTasks, setLateTasks] = useState<Task[]>([]);
   const [dateTasks, setDateTasks] = useState<Task[]>([]);
-  const [filteredPendingTasks, setFilteredPendingTasks] = useState<Task[]>([]);
+  const [filteredLateTasks, setFilteredLateTasks] = useState<Task[]>([]);
   const [filteredDateTasks, setFilteredDateTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
   const [bringingToToday, setBringingToToday] = useState(false);
 
-  const showPendingTasks = isToday(customDate) && pendingTasks.length > 0;
+  const showLateTasks = isToday(customDate) && lateTasks.length > 0;
 
   const showDateTasks = true;
 
@@ -78,17 +86,20 @@ export function Tasks() {
           date: customDate,
         });
 
-        let pendingTasks: Task[] = [];
+        let lateTasks: Task[] = [];
 
         if (isToday(customDate)) {
-          pendingTasks = await listPendingTasksUseCase.execute(user.id);
+          lateTasks = await ListLateTasksUseCase.execute(user.id);
         }
 
-        const sortedDate = sortTasksByEnergy(dateTasks, energyLevel);
-        const sortedPending = sortTasksByEnergy(pendingTasks, energyLevel);
+        const sortedDate = sortTasksByStatusAndEnergy(dateTasks, energyLevel);
+        const sortedLate = sortTasksByStatusAndEnergy(
+          lateTasks,
+          energyLevel,
+        );
 
         setDateTasks(sortedDate);
-        setPendingTasks(sortedPending);
+        setLateTasks(sortedLate);
       } catch {
         toast.error("Erro ao carregar tarefas", {
           position: "bottom-center",
@@ -102,11 +113,14 @@ export function Tasks() {
   }, [customDate, user]);
 
   useEffect(() => {
-    const sortedDateTasks = sortTasksByEnergy(dateTasks, energyLevel);
-    const sortedPendingTasks = sortTasksByEnergy(pendingTasks, energyLevel);
+    const sortedDateTasks = sortTasksByStatusAndEnergy(dateTasks, energyLevel);
+    const sortedLateTasks = sortTasksByStatusAndEnergy(
+      lateTasks,
+      energyLevel,
+    );
 
     setDateTasks(sortedDateTasks);
-    setPendingTasks(sortedPendingTasks);
+    setLateTasks(sortedLateTasks);
   }, [energyLevel]);
 
   useEffect(() => {
@@ -114,29 +128,33 @@ export function Tasks() {
       task.title.toLowerCase().includes(taskTitle.toLowerCase()),
     );
 
-    const filteredPendingTasks = pendingTasks.filter((task) =>
+    const filteredLateTasks = lateTasks.filter((task) =>
       task.title.toLowerCase().includes(taskTitle.toLowerCase()),
     );
 
-    setFilteredDateTasks(filteredDateTasks);
-    setFilteredPendingTasks(filteredPendingTasks);
-  }, [taskTitle, dateTasks, pendingTasks]);
+    setFilteredDateTasks(
+      sortTasksByStatusAndEnergy(filteredDateTasks, energyLevel),
+    );
+    setFilteredLateTasks(
+      sortTasksByStatusAndEnergy(filteredLateTasks, energyLevel),
+    );
+  }, [taskTitle, dateTasks, lateTasks]);
 
   async function handleBringAllToToday() {
-    if (pendingTasks.length === 0) return;
+    if (lateTasks.length === 0) return;
 
     try {
       setBringingToToday(true);
 
-      await bringPendingTasksToTodayUseCase.execute(
-        pendingTasks.map((task) => task.id),
+      await BringLateTasksToTodayUseCase.execute(
+        lateTasks.map((task) => task.id),
       );
 
       setDateTasks((prev) =>
-        sortTasksByEnergy([...pendingTasks, ...prev], energyLevel),
+        sortTasksByEnergy([...lateTasks, ...prev], energyLevel),
       );
 
-      setPendingTasks([]);
+      setLateTasks([]);
 
       toast.success("Tarefas movidas para hoje", {
         position: "bottom-center",
@@ -154,12 +172,12 @@ export function Tasks() {
 
   async function handleBringTaskToToday(taskId: string) {
     try {
-      await bringPendingTasksToTodayUseCase.execute([taskId]);
+      await BringLateTasksToTodayUseCase.execute([taskId]);
 
-      const task = pendingTasks.find((t) => t.id === taskId);
+      const task = lateTasks.find((t) => t.id === taskId);
       if (!task) return;
 
-      setPendingTasks((prev) => prev.filter((t) => t.id !== taskId));
+      setLateTasks((prev) => prev.filter((t) => t.id !== taskId));
       setDateTasks((prev) => sortTasksByEnergy([task, ...prev], energyLevel));
 
       toast.success("Tarefa movida para hoje", {
@@ -179,7 +197,7 @@ export function Tasks() {
       await deleteTaskUseCase.execute(taskId);
 
       setDateTasks((prev) => prev.filter((task) => task.id !== taskId));
-      setPendingTasks((prev) => prev.filter((task) => task.id !== taskId));
+      setLateTasks((prev) => prev.filter((task) => task.id !== taskId));
 
       toast.success("Tarefa removida", {
         position: "bottom-center",
@@ -199,19 +217,59 @@ export function Tasks() {
 
       setDateTasks((prev) =>
         prev.map((task) =>
-          task.id === taskId ? { ...task, completed } : task,
+          task.id === taskId ? { ...task, completed, inProgress: false } : task,
         ),
       );
 
-      setPendingTasks((prev) =>
+      setLateTasks((prev) =>
         prev.map((task) =>
-          task.id === taskId ? { ...task, completed } : task,
+          task.id === taskId ? { ...task, completed, inProgress: false } : task,
         ),
       );
     } catch (err) {
       console.error(err);
 
       toast.error("Erro ao atualizar tarefa", {
+        position: "bottom-center",
+      });
+    }
+  }
+
+  async function handleMoveTaskStatus(taskId: string, status: TaskStatus) {
+    try {
+      await moveTaskStatusUseCase.execute(taskId, status);
+
+      setDateTasks((prev) =>
+        prev.map((task) =>
+          task.id === taskId
+            ? {
+                ...task,
+                inProgress: status === "inProgress",
+                completed: status !== "pending" && status !== "inProgress",
+              }
+            : task,
+        ),
+      );
+
+      setLateTasks((prev) =>
+        prev.map((task) =>
+          task.id === taskId
+            ? {
+                ...task,
+                inProgress: status === "inProgress",
+                completed: status !== "pending" && status !== "inProgress",
+              }
+            : task,
+        ),
+      );
+
+      toast.success("Tarefa atualizada", {
+        description: "O status da tarefa foi atualizado com sucesso.",
+        position: "bottom-center",
+      });
+    } catch (error) {
+      toast.error("Erro ao mover tarefa", {
+        description: "Não foi possível atualizar o status da tarefa.",
         position: "bottom-center",
       });
     }
@@ -257,10 +315,10 @@ export function Tasks() {
             customDate={customDate}
             loading={loading}
             dateTasks={dateTasks}
-            filteredPendingTasks={filteredPendingTasks}
+            filteredLateTasks={filteredLateTasks}
             filteredDateTasks={filteredDateTasks}
             bringingToToday={bringingToToday}
-            showPendingTasks={showPendingTasks}
+            showLateTasks={showLateTasks}
             showDateTasks={showDateTasks}
             onBringAllToToday={handleBringAllToToday}
             onBringToToday={handleBringTaskToToday}
@@ -273,12 +331,13 @@ export function Tasks() {
 
         {viewMode === "kanban" && (
           <TaskKanbanView
-            filteredPendingTasks={filteredPendingTasks}
+            filteredLateTasks={filteredLateTasks}
             filteredDateTasks={filteredDateTasks}
             onDelete={handleDeleteTask}
             onEdit={handleEditTask}
             onStartFocus={handleFocusTask}
             onToggleComplete={handleToggleCompleted}
+            onMoveStatusTask={handleMoveTaskStatus}
           />
         )}
       </div>

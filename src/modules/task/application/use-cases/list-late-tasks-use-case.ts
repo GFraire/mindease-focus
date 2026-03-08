@@ -1,7 +1,7 @@
 import { formatDateIsoString } from "@/shared/utils/date/date-helper";
 import type { TaskRepository } from "../../domain/repositories/task-repository";
 
-export class ListPendingTasksUseCase {
+export class ListLateTasksUseCase {
   private tasksRepository: TaskRepository;
 
   constructor(tasksRepository: TaskRepository) {
@@ -12,6 +12,6 @@ export class ListPendingTasksUseCase {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    return this.tasksRepository.findPendingTasks(userId, formatDateIsoString(today));
+    return this.tasksRepository.findLateTasks(userId, formatDateIsoString(today));
   }
 }

@@ -15,7 +15,7 @@ describe("UpdateTaskUseCase", () => {
       create: vi.fn(),
       delete: vi.fn(),
       findById: vi.fn(),
-      findPendingTasks: vi.fn(),
+      findLateTasks: vi.fn(),
       listByDate: vi.fn(),
     };
 
@@ -39,7 +39,10 @@ describe("UpdateTaskUseCase", () => {
     await updateTaskUseCase.execute(taskId, data);
 
     expect(taskRepository.update).toHaveBeenCalledWith(taskId, {
-      ...data,
+      title: data.title,
+      subtasks: data.subtasks,
+      energy: data.energy,
+      focusDuration: data.focusDuration,
       scheduledFor: formatDateIsoString(date),
     });
   });

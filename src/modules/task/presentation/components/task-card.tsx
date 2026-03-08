@@ -8,6 +8,7 @@ import {
   Trash2,
   Timer,
   ChevronsDown,
+  ArrowLeftRight,
 } from "lucide-react";
 
 import {
@@ -20,29 +21,67 @@ import {
 import type { Task } from "../../domain/entities/task";
 import { cn } from "@/shared/lib/utils";
 import { getEnergyLabel } from "@/shared/utils/translate/translate-label";
+import type { TaskStatus, TaskViewMode } from "../pages/tasks";
 
 interface TaskCardProps {
   task: Task;
-  pending?: boolean;
+  late?: boolean;
+  viewMode?: TaskViewMode;
   onToggleComplete: (taskId: string, completed: boolean) => void;
   onEdit: (task: Task) => void;
   onStartFocus: (task: Task) => void;
   onDelete: (taskId: string) => void;
   onBringToToday?: (taskId: string) => void;
+  onMoveStatus?: (taskId: string, status: TaskStatus) => void;
 }
 
 export function TaskCard({
   task,
-  pending = false,
+  late = false,
+  viewMode,
   onToggleComplete,
   onEdit,
   onStartFocus,
   onDelete,
   onBringToToday,
+  onMoveStatus,
 }: TaskCardProps) {
+  const statusOptions = [];
+
+  if (viewMode === "kanban" && onMoveStatus) {
+    if (task.completed) {
+      statusOptions.push(
+        {
+          label: 'Mover para "Em progresso"',
+          status: "inProgress",
+        },
+        {
+          label: 'Mover para "Pendente"',
+          status: "pending",
+        },
+      );
+    } else if (task.inProgress) {
+      statusOptions.push({
+        label: 'Mover para "Pendente"',
+        status: "pending",
+      });
+    } else {
+      statusOptions.push({
+        label: 'Mover para "Em progresso"',
+        status: "inProgress",
+      });
+    }
+  }
+
   return (
     <div className="flex items-center justify-between rounded-lg border border-border bg-card p-4">
-      <div className={cn("flex items-center gap-4", pending && "opacity-70", task.completed && 'opacity-60')}>
+      <div
+        className={cn(
+          "flex items-center gap-4",
+          late && "opacity-70",
+          task.completed && "opacity-60",
+        )}
+      >
         <Checkbox
           className="cursor-pointer h-5 w-5 border-muted-light"
           checked={task.completed}
@@ -61,12 +100,12 @@ export function TaskCard({
           </span>
 
           <div className="flex items-center gap-4 text-xs text-muted">
-            {pending && (
+            {late && (
               <div className="flex gap-2 items-center bg-muted/15! py-0.5 px-2 rounded-full">
                 <Clock className="text-muted" size={16} />
 
                 <span className="text-muted font-semibold text-body-sm">
-                  PENDENTE
+                  ATRASADA
                 </span>
               </div>
             )}
@@ -94,7 +133,7 @@ export function TaskCard({
       </div>
 
       <div className="flex gap-2">
-        {pending && onBringToToday && (
+        {late && onBringToToday && (
           <ChevronsDown
             className="text-primary cursor-pointer hover:opacity-80"
             size={24}
@@ -108,6 +147,17 @@ export function TaskCard({
           </DropdownMenuTrigger>
 
           <DropdownMenuContent align="end">
+            {statusOptions.map((option) => (
+              <DropdownMenuItem
+                key={option.status}
+                className="cursor-pointer"
+                onClick={() => onMoveStatus?.(task.id, option.status as TaskStatus)}
+              >
+                <ArrowLeftRight className="mr-1 h-4 w-4" />
+                {option.label}
+              </DropdownMenuItem>
+            ))}
+
             <DropdownMenuItem
               className="cursor-pointer"
               onClick={() => onEdit(task)}

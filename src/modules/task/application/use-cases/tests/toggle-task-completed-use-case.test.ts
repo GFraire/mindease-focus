@@ -12,7 +12,7 @@ describe("ToggleTaskCompletedUseCase", () => {
       create: vi.fn(),
       delete: vi.fn(),
       findById: vi.fn(),
-      findPendingTasks: vi.fn(),
+      findLateTasks: vi.fn(),
       listByDate: vi.fn(),
     };
 

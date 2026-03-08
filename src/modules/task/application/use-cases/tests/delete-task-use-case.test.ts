@@ -13,7 +13,7 @@ describe("DeleteTaskUseCase", () => {
       create: vi.fn(),
       delete: vi.fn().mockResolvedValue(undefined),
       findById: vi.fn(),
-      findPendingTasks: vi.fn(),
+      findLateTasks: vi.fn(),
       listByDate: vi.fn(),
     };
 
