@@ -4,11 +4,16 @@ import { TaskForm, type TaskFormValues } from "../components/task-form";
 import { makeCreateTaskUseCase } from "../../container";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { useCognitiveSettingsStore } from "@/shared/ui/store/cognitive-settings-store";
 
 export function CreateTask() {
   const navigate = useNavigate();
 
   const user = useAuthStore((state) => state.user);
+
+  const reduceNotifications = useCognitiveSettingsStore(
+    (state) => state.reduceNotifications,
+  );
 
   const createTaskUseCase = useMemo(() => makeCreateTaskUseCase(), []);
 
@@ -22,9 +27,11 @@ export function CreateTask() {
 
       await createTaskUseCase.execute(user.id, data);
 
-      toast.success("Tarefa criada com sucesso!", {
-        position: "bottom-center",
-      });
+      if (!reduceNotifications) {
+        toast.success("Tarefa criada com sucesso!", {
+          position: "bottom-center",
+        });
+      }
 
       navigate(-1);
     } catch (error) {

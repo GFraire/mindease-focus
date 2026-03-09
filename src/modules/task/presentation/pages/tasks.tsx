@@ -57,6 +57,9 @@ export function Tasks() {
 
   const user = useAuthStore((state) => state.user);
   const energyLevel = useCognitiveSettingsStore((state) => state.energy);
+  const reduceNotifications = useCognitiveSettingsStore(
+    (state) => state.reduceNotifications,
+  );
 
   const [viewMode, setViewMode] = useState<TaskViewMode>("list");
   const [taskTitle, setTaskTitle] = useState("");
@@ -151,9 +154,11 @@ export function Tasks() {
 
       setLateTasks([]);
 
-      toast.success("Tarefas movidas para hoje", {
-        position: "bottom-center",
-      });
+      if (!reduceNotifications) {
+        toast.success("Tarefas movidas para hoje", {
+          position: "bottom-center",
+        });
+      }
     } catch (err) {
       console.error(err);
 
@@ -175,9 +180,11 @@ export function Tasks() {
       setLateTasks((prev) => prev.filter((t) => t.id !== taskId));
       setDateTasks((prev) => sortTasksByEnergy([task, ...prev], energyLevel));
 
-      toast.success("Tarefa movida para hoje", {
-        position: "bottom-center",
-      });
+      if (!reduceNotifications) {
+        toast.success("Tarefa movida para hoje", {
+          position: "bottom-center",
+        });
+      }
     } catch (err) {
       console.error(err);
 
@@ -194,9 +201,11 @@ export function Tasks() {
       setDateTasks((prev) => prev.filter((task) => task.id !== taskId));
       setLateTasks((prev) => prev.filter((task) => task.id !== taskId));
 
-      toast.success("Tarefa removida", {
-        position: "bottom-center",
-      });
+      if (!reduceNotifications) {
+        toast.success("Tarefa removida", {
+          position: "bottom-center",
+        });
+      }
     } catch (err) {
       console.error(err);
 
@@ -258,10 +267,12 @@ export function Tasks() {
         ),
       );
 
-      toast.success("Tarefa atualizada", {
-        description: "O status da tarefa foi atualizado com sucesso.",
-        position: "bottom-center",
-      });
+      if (!reduceNotifications) {
+        toast.success("Tarefa atualizada", {
+          description: "O status da tarefa foi atualizado com sucesso.",
+          position: "bottom-center",
+        });
+      }
     } catch {
       toast.error("Erro ao mover tarefa", {
         description: "Não foi possível atualizar o status da tarefa.",
@@ -283,11 +294,15 @@ export function Tasks() {
   }
 
   return (
-    <div className="flex min-h-screen w-full">
+    <div className="flex h-screen w-full">
       <Sidebar />
 
       <main
-        className="flex flex-col gap-6 p-4 sm:p-6 lg:p-8 w-full min-h-screen"
+        className="flex flex-col gap-6 p-4 sm:p-6 lg:p-8 w-full h-screen overflow-auto
+        [&::-webkit-scrollbar]:w-2
+        [&::-webkit-scrollbar-track]:bg-transparent
+        [&::-webkit-scrollbar-thumb]:bg-muted/40
+        [&::-webkit-scrollbar-thumb]:rounded-full"
         aria-labelledby="tasks-page-title"
       >
         <h1 id="tasks-page-title" className="sr-only">

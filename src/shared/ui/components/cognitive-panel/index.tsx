@@ -22,12 +22,12 @@ export function CognitivePanel({ open, onOpenChange }: CognitivePanelProps) {
   const {
     energy,
     setEnergy,
-    fontSize,
-    setFontSize,
     darkMode,
+    interfaceComplexity,
+    reduceNotifications,
     toggleDarkMode,
-    reduceAnimations,
-    toggleReduceAnimations,
+    setInterfaceComplexity,
+    toggleReduceNotifications,
     muteNotifications,
     toggleMuteNotifications,
   } = useCognitiveSettingsStore();
@@ -79,7 +79,7 @@ export function CognitivePanel({ open, onOpenChange }: CognitivePanelProps) {
             <div
               role="radiogroup"
               aria-label="Selecione seu nível de energia"
-              className="flex gap-2"
+              className="grid grid-cols-3 gap-2"
             >
               <SelectButton
                 role="radio"
@@ -125,42 +125,46 @@ export function CognitivePanel({ open, onOpenChange }: CognitivePanelProps) {
 
             <div className="space-y-2">
               <p
-                id="font-size-label"
+                id="interface-complexity-label"
                 className="text-body font-semibold text-high-contrast"
               >
-                Tamanho da fonte
+                Nível de detalhes da interface
+              </p>
+
+              <p className="text-body-sm text-muted">
+                Escolha quanta informação deseja ver nas tarefas.
               </p>
 
               <div
                 role="radiogroup"
-                aria-labelledby="font-size-label"
-                className="flex gap-2"
+                aria-labelledby="interface-complexity-label"
+                className="grid grid-cols-3 gap-2"
               >
                 <SelectButton
                   role="radio"
-                  aria-checked={fontSize === "normal"}
-                  selected={fontSize === "normal"}
-                  onClick={() => setFontSize("normal")}
+                  aria-checked={interfaceComplexity === "basic"}
+                  selected={interfaceComplexity === "basic"}
+                  onClick={() => setInterfaceComplexity("basic")}
                 >
-                  Normal
+                  Básico
                 </SelectButton>
 
                 <SelectButton
                   role="radio"
-                  aria-checked={fontSize === "large"}
-                  selected={fontSize === "large"}
-                  onClick={() => setFontSize("large")}
+                  aria-checked={interfaceComplexity === "intermediate"}
+                  selected={interfaceComplexity === "intermediate"}
+                  onClick={() => setInterfaceComplexity("intermediate")}
                 >
-                  Grande
+                  Intermediário
                 </SelectButton>
 
                 <SelectButton
                   role="radio"
-                  aria-checked={fontSize === "extra"}
-                  selected={fontSize === "extra"}
-                  onClick={() => setFontSize("extra")}
+                  aria-checked={interfaceComplexity === "advanced"}
+                  selected={interfaceComplexity === "advanced"}
+                  onClick={() => setInterfaceComplexity("advanced")}
                 >
-                  Extra
+                  Avançado
                 </SelectButton>
               </div>
             </div>
@@ -183,7 +187,7 @@ export function CognitivePanel({ open, onOpenChange }: CognitivePanelProps) {
                 checked={darkMode}
                 onCheckedChange={toggleDarkMode}
                 aria-labelledby="dark-mode-label"
-                className="data-[state=unchecked]:bg-muted-light data-[state=unchecked]:border data-[state=unchecked]:border-border"
+                className="data-[state=unchecked]:bg-muted-light data-[state=unchecked]:border data-[state=unchecked]:border-border cursor-pointer"
               />
             </div>
           </section>
@@ -204,22 +208,22 @@ export function CognitivePanel({ open, onOpenChange }: CognitivePanelProps) {
             <div className="flex items-center justify-between">
               <div>
                 <p
-                  id="reduce-animations-label"
+                  id="reduce-notifications-label"
                   className="text-high-contrast font-semibold text-body"
                 >
-                  Reduzir animações
+                  Reduzir notificações
                 </p>
 
                 <p className="text-body-sm text-muted">
-                  Evita distrações em movimento.
+                  Diminui alertas e interrupções durante o uso.
                 </p>
               </div>
 
               <Switch
-                checked={reduceAnimations}
-                onCheckedChange={toggleReduceAnimations}
+                checked={reduceNotifications}
+                onCheckedChange={toggleReduceNotifications}
                 aria-labelledby="reduce-animations-label"
-                className="data-[state=unchecked]:bg-muted-light data-[state=unchecked]:border data-[state=unchecked]:border-border"
+                className="data-[state=unchecked]:bg-muted-light data-[state=unchecked]:border data-[state=unchecked]:border-border cursor-pointer"
               />
             </div>
 
@@ -241,7 +245,7 @@ export function CognitivePanel({ open, onOpenChange }: CognitivePanelProps) {
                 checked={muteNotifications}
                 onCheckedChange={toggleMuteNotifications}
                 aria-labelledby="mute-notifications-label"
-                className="data-[state=unchecked]:bg-muted-light data-[state=unchecked]:border data-[state=unchecked]:border-border"
+                className="data-[state=unchecked]:bg-muted-light data-[state=unchecked]:border data-[state=unchecked]:border-border cursor-pointer"
               />
             </div>
           </section>

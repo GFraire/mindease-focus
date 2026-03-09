@@ -41,6 +41,9 @@ export function Home() {
 
   const user = useAuthStore((state) => state.user);
   const energyLevel = useCognitiveSettingsStore((state) => state.energy);
+  const reduceNotifications = useCognitiveSettingsStore(
+    (state) => state.reduceNotifications,
+  );
 
   const [focusTask, setFocusTask] = useState<Task | null>(null);
   const [nextTasks, setNextTasks] = useState<Task[]>([]);
@@ -99,9 +102,11 @@ export function Home() {
     try {
       await deleteTaskUseCase.execute(taskId);
 
-      toast.success("Tarefa removida", {
-        position: "bottom-center",
-      });
+      if (!reduceNotifications) {
+        toast.success("Tarefa removida", {
+          position: "bottom-center",
+        });
+      }
 
       setNextTasks((prev) => {
         const updated = prev.filter((task) => task.id !== taskId);
@@ -127,12 +132,14 @@ export function Home() {
     try {
       await toggleTaskCompletedUseCase.execute(taskId, completed);
 
-      toast.success(
-        completed ? "Tarefa concluída 🎉" : "Tarefa marcada como pendente",
-        {
-          position: "bottom-center",
-        },
-      );
+      if (!reduceNotifications) {
+        toast.success(
+          completed ? "Tarefa concluída 🎉" : "Tarefa marcada como pendente",
+          {
+            position: "bottom-center",
+          },
+        );
+      }
 
       if (focusTask?.id === taskId) {
         reloadTasks();

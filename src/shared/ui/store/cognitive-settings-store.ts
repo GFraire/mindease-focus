@@ -2,20 +2,20 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export type EnergyLevel = "low" | "medium" | "high";
-export type FontSize = "normal" | "large" | "extra";
+export type InterfaceComplexity = "basic" | "intermediate" | "advanced";
 
 interface CognitiveSettingsStore {
   energy: EnergyLevel;
-  fontSize: FontSize;
+  interfaceComplexity: InterfaceComplexity;
   darkMode: boolean;
-  reduceAnimations: boolean;
+  reduceNotifications: boolean;
   muteNotifications: boolean;
-
   setEnergy: (value: EnergyLevel) => void;
-  setFontSize: (value: FontSize) => void;
+  setInterfaceComplexity: (value: InterfaceComplexity) => void;
   toggleDarkMode: () => void;
-  toggleReduceAnimations: () => void;
+  toggleReduceNotifications: () => void;
   toggleMuteNotifications: () => void;
+
   reset: () => void;
 }
 
@@ -23,31 +23,26 @@ export const useCognitiveSettingsStore = create<CognitiveSettingsStore>()(
   persist(
     (set) => ({
       energy: "high",
-      fontSize: "normal",
+      interfaceComplexity: "intermediate",
       darkMode: false,
-      reduceAnimations: false,
+      reduceNotifications: false,
       muteNotifications: false,
-
       setEnergy: (value) => set({ energy: value }),
-
-      setFontSize: (value) => set({ fontSize: value }),
-
+      setInterfaceComplexity: (value) => set({ interfaceComplexity: value }),
       toggleDarkMode: () => set((state) => ({ darkMode: !state.darkMode })),
-
-      toggleReduceAnimations: () =>
-        set((state) => ({ reduceAnimations: !state.reduceAnimations })),
-
       toggleMuteNotifications: () =>
+        set((state) => ({ muteNotifications: !state.muteNotifications })),
+      toggleReduceNotifications: () =>
         set((state) => ({
-          muteNotifications: !state.muteNotifications,
+          reduceNotifications: !state.reduceNotifications,
         })),
 
       reset: () =>
         set({
           energy: "high",
-          fontSize: "normal",
-          reduceAnimations: false,
-          muteNotifications: false,
+          interfaceComplexity: "intermediate",
+          darkMode: false,
+          reduceNotifications: false,
         }),
     }),
     {

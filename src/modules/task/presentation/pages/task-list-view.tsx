@@ -47,7 +47,7 @@ export function TaskListView({
 }: Props) {
   return (
     <div
-      className="overflow-auto h-full flex flex-col gap-6"
+      className="h-full flex flex-col gap-6"
       aria-live="polite"
       aria-busy={loading}
     >
@@ -64,7 +64,7 @@ export function TaskListView({
                 id="late-tasks-title"
                 className="text-muted font-semibold text-body"
               >
-                Tarefas atrasadas
+                TAREFAS ATRASADAS
               </h2>
 
               {loading && (
@@ -122,7 +122,7 @@ export function TaskListView({
               id="date-tasks-title"
               className="text-muted font-semibold text-body"
             >
-              Para {dateFilter === "today" ? "hoje" : formatDate(customDate)}
+              PARA {dateFilter === "today" ? "HOJE" : formatDate(customDate)}
             </h2>
 
             {loading && (

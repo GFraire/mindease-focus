@@ -7,6 +7,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import type { CreateTaskDTO } from "../../application/dtos/create-task-dto";
 import type { Task } from "../../domain/entities/task";
 import { getWhenFromDate } from "@/shared/utils/date/date-helper";
+import { useCognitiveSettingsStore } from "@/shared/ui/store/cognitive-settings-store";
 
 export function EditTask() {
   const navigate = useNavigate();
@@ -17,6 +18,10 @@ export function EditTask() {
   const { taskId } = useParams();
 
   const user = useAuthStore((state) => state.user);
+
+  const reduceNotifications = useCognitiveSettingsStore(
+    (state) => state.reduceNotifications,
+  );
 
   const getTaskByIdUseCase = useMemo(() => makeGetTaskByIdUseCase(), []);
   const updateTaskUseCase = useMemo(() => makeUpdateTaskUseCase(), []);
@@ -82,9 +87,11 @@ export function EditTask() {
 
       await updateTaskUseCase.execute(taskId, data);
 
-      toast.success("Tarefa atualizada com sucesso!", {
-        position: "bottom-center",
-      });
+      if (!reduceNotifications) {
+        toast.success("Tarefa atualizada com sucesso!", {
+          position: "bottom-center",
+        });
+      }
 
       navigate(-1);
     } catch (error) {
