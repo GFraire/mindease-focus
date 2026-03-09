@@ -19,6 +19,7 @@ export function SelectButton({
   return (
     <Button
       variant="outline"
+      type="button"
       onClick={onClick}
       size="lg"
       className={cn(

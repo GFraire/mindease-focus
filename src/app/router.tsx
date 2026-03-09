@@ -6,6 +6,7 @@ import { Home } from "@/modules/task/presentation/pages/home";
 import { CreateTask } from "@/modules/task/presentation/pages/create-task";
 import { Tasks } from "@/modules/task/presentation/pages/tasks";
 import { EditTask } from "@/modules/task/presentation/pages/edit-task";
+import { FocusTimer } from "@/modules/focus/presentation/pages/focus-timer";
 
 export function Router() {
   return (
@@ -25,6 +26,10 @@ export function Router() {
 
       <Route element={<PrivateRoute />}>
         <Route path="/tasks" element={<Tasks />} />
+      </Route>
+
+      <Route element={<PrivateRoute />}>
+        <Route path="/focus-task/:taskId" element={<FocusTimer />} />
       </Route>
 
       <Route element={<PrivateRoute />}>

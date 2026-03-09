@@ -208,14 +208,16 @@ export function TaskCard({
               Editar detalhes
             </DropdownMenuItem>
 
-            <DropdownMenuItem
-              className="cursor-pointer"
-              onClick={() => onStartFocus(task)}
-              aria-label={`Iniciar foco na tarefa ${task.title}`}
-            >
-              <Play className="mr-1 h-4 w-4" aria-hidden="true" />
-              Iniciar foco
-            </DropdownMenuItem>
+            {!task.completed && (
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => onStartFocus(task)}
+                aria-label={`Iniciar foco na tarefa ${task.title}`}
+              >
+                <Play className="mr-1 h-4 w-4" aria-hidden="true" />
+                Iniciar foco
+              </DropdownMenuItem>
+            )}
 
             <DropdownMenuItem
               className="text-red-500 focus:text-red-500 cursor-pointer"
