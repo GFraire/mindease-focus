@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { Clock, LogOut } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Clock, LogOut, Settings } from "lucide-react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { FocusHeader } from "../components/focus-header";
@@ -20,6 +20,9 @@ import {
 
 import { cn } from "@/shared/lib/utils";
 import { toast } from "sonner";
+import { useTimerSounds } from "@/shared/ui/hooks/use-timer-sounds";
+import { useCognitiveSettingsStore } from "@/shared/ui/store/cognitive-settings-store";
+import { CognitivePanel } from "@/shared/ui/components/cognitive-panel";
 
 const TOTAL_CYCLES = 4;
 
@@ -49,9 +52,17 @@ export function FocusTimer() {
 
   const navigate = useNavigate();
   const location = useLocation();
+
+  const muteNotifications = useCognitiveSettingsStore(
+    (state) => state.muteNotifications,
+  );
+
   const { taskId } = useParams();
+  const { playFocusEnd, playBreakEnd } = useTimerSounds();
 
   const stateTask = location.state as Task | undefined;
+
+  const phaseEndingRef = useRef(false);
 
   const [task, setTask] = useState<Task | null>(stateTask ?? null);
   const [isLoading, setIsLoading] = useState(!stateTask);
@@ -65,6 +76,7 @@ export function FocusTimer() {
   const [hasStarted, setHasStarted] = useState(false);
 
   const [isExitModalOpen, setIsExitModalOpen] = useState(false);
+  const [openSettings, setOpenSettings] = useState(false);
 
   const focusMinutes = task?.focusDuration ?? 30;
 
@@ -99,7 +111,7 @@ export function FocusTimer() {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           handlePhaseEnd();
-          return prev;
+          return 0;
         }
 
         return prev - 1;
@@ -109,7 +121,21 @@ export function FocusTimer() {
     return () => clearInterval(interval);
   }, [isRunning, phase]);
 
+  useEffect(() => {
+    phaseEndingRef.current = false;
+  }, [phase]);
+
   function handlePhaseEnd() {
+    if (phaseEndingRef.current) return;
+
+    phaseEndingRef.current = true;
+
+    if (phase === "focus") {
+      playFocusEnd(muteNotifications);
+    } else {
+      playBreakEnd(muteNotifications);
+    }
+
     setHasStarted(false);
     setIsRunning(false);
 
@@ -161,6 +187,7 @@ export function FocusTimer() {
           label: "Editar tarefa",
           onClick: () => navigate(`/edit-task/${task.id}`),
         },
+        position: "bottom-center",
       });
     }
   }
@@ -271,6 +298,16 @@ export function FocusTimer() {
 
           <span className="text-muted-light text-body-lg">Sair do foco</span>
         </BaseButton>
+
+        <BaseButton
+          variant="ghost"
+          className="[&_svg]:size-5 flex items-center gap-2 cursor-pointer hover:bg-transparent hover:opacity-60"
+          onClick={() => setOpenSettings(true)}
+        >
+          <Settings className="text-muted-light" />
+
+          <span className="text-muted-light text-body-lg">Configurações</span>
+        </BaseButton>
       </div>
 
       <ExitFocusModal
@@ -278,6 +315,8 @@ export function FocusTimer() {
         onClose={() => setIsExitModalOpen(false)}
         onConfirm={() => navigate("/")}
       />
+
+      <CognitivePanel open={openSettings} onOpenChange={setOpenSettings} />
     </div>
   );
 }
