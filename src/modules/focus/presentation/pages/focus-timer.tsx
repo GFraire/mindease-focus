@@ -103,6 +103,7 @@ export function FocusTimer() {
           label: "Editar tarefa",
           onClick: () => navigate(`/edit-task/${task?.id}`),
         },
+        position: "bottom-center",
       });
     }
 
