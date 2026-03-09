@@ -17,7 +17,7 @@ Este projeto utiliza Firebase configurado via variáveis de ambiente usando Vite
 ---
 
 ## ⚙️ 2. Criar arquivo `.env`
-Teste
+
 Na raiz do projeto crie: .env
 
 Adicione:
