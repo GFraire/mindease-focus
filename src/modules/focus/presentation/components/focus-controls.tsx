@@ -19,16 +19,29 @@ export function FocusControls({
   onFinish,
   onSkip,
 }: Props) {
+  const toggleLabel = !hasStarted
+    ? "Iniciar temporizador"
+    : isRunning
+      ? "Pausar temporizador"
+      : "Retomar temporizador";
+
   return (
-    <div className="flex gap-4">
+    <div
+      className="flex gap-4"
+      role="group"
+      aria-label="Controles do temporizador de foco"
+    >
       <BaseButton
+        type="button"
         onClick={onToggle}
+        aria-label={toggleLabel}
+        aria-pressed={isRunning}
         className="[&_svg]:size-5 flex items-center gap-2 rounded-md bg-muted/10! px-8 py-2 w-42 cursor-pointer hover:bg-muted/15!"
       >
         {isRunning ? (
-          <Pause className="text-muted" />
+          <Pause className="text-muted" aria-hidden="true" />
         ) : (
-          <Play className="text-muted" />
+          <Play className="text-muted" aria-hidden="true" />
         )}
 
         <span className="text-muted text-body-lg font-medium">
@@ -38,10 +51,12 @@ export function FocusControls({
 
       {phase === "focus" && (
         <BaseButton
+          type="button"
           onClick={onFinish}
+          aria-label="Finalizar tarefa atual"
           className="[&_svg]:size-5! flex items-center gap-2 w-42 cursor-pointer rounded-md bg-primary px-8 py-2"
         >
-          <CircleCheck className="text-white! " />
+          <CircleCheck className="text-white! " aria-hidden="true" />
 
           <span className="text-white! text-body-lg font-medium">
             Finalizar
@@ -51,11 +66,13 @@ export function FocusControls({
 
       {phase !== "focus" && (
         <BaseButton
+          type="button"
           onClick={onSkip}
+          aria-label="Pular intervalo atual"
           variant="ghost"
           className="[&_svg]:size-5! flex items-center gap-2 w-42 cursor-pointer rounded-md px-8 py-2 hover:bg-transparent hover:opacity-80"
         >
-          <SkipForward className="text-muted " />
+          <SkipForward className="text-muted " aria-hidden="true" />
 
           <span className="text-muted text-body-lg font-medium">
             Pular intervalo

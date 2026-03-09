@@ -11,17 +11,31 @@ export function FocusTaskCard({ task }: Props) {
   if (!subtasks.length) return null;
 
   return (
-    <div className="flex flex-col gap-2 bg-card p-4 w-full rounded-md border border-border">
-      {subtasks.map((subtask, index) => (
-        <div
-          className="flex items-center gap-4 p-3 bg-background rounded-md"
-          key={index}
-        >
-          <Checkbox className="border-muted-light size-5 border-2 cursor-pointer" />
+    <div
+      className="flex flex-col gap-2 bg-card p-4 w-full rounded-md border border-border"
+      role="group"
+      aria-label="Subtarefas da tarefa atual"
+    >
+      {subtasks.map((subtask, index) => {
+        const id = `subtask-${index}`;
 
-          <span className="text-body text-high-contrast">{subtask}</span>
-        </div>
-      ))}
+        return (
+          <label
+            htmlFor={id}
+            className="flex items-center gap-4 p-3 bg-background rounded-md"
+            key={index}
+          >
+            <Checkbox
+              id={id}
+              className="border-muted-light size-5 border-2 cursor-pointer"
+            />
+
+            <span id={`${id}-label`} className="text-body text-high-contrast">
+              {subtask}
+            </span>
+          </label>
+        );
+      })}
     </div>
   );
 }

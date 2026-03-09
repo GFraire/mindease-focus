@@ -8,12 +8,14 @@ interface Props {
 
 export function FocusHeader({ phase }: Props) {
   return (
-    <div className="flex gap-2 items-center">
+    <header className="flex gap-2 items-center" aria-label="MindEase Focus">
       <Logo
         className={cn(
           "w-8 h-8",
           phase === "focus" ? "text-primary" : "text-success",
         )}
+        aria-hidden="true"
+        focusable="false"
       />
 
       <span
@@ -24,6 +26,6 @@ export function FocusHeader({ phase }: Props) {
       >
         MindEase Focus
       </span>
-    </div>
+    </header>
   );
 }

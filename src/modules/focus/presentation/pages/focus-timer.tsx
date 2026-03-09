@@ -20,31 +20,18 @@ import {
 
 import { cn } from "@/shared/lib/utils";
 import { toast } from "sonner";
+
 import { useTimerSounds } from "@/shared/ui/hooks/use-timer-sounds";
 import { useCognitiveSettingsStore } from "@/shared/ui/store/cognitive-settings-store";
+
 import { CognitivePanel } from "@/shared/ui/components/cognitive-panel";
 
-const TOTAL_CYCLES = 4;
-
-const FOCUS_CONFIG = {
-  15: { break: 3, longBreak: 6 },
-  30: { break: 5, longBreak: 10 },
-  45: { break: 7, longBreak: 15 },
-  60: { break: 10, longBreak: 20 },
-};
-
-const COGNITIVE_ALERT_CYCLES = {
-  15: 8,
-  30: 6,
-  45: 5,
-  60: 4,
-};
-
-export type Phase = "focus" | "break" | "longBreak";
+import { FocusSession } from "@/modules/focus/domain/entities/focus-session";
+import { getNextFocusPhaseUseCase } from "@/modules/focus/application/use-cases/get-next-focus-phase-use-case";
+import { shouldShowCognitiveAlertUseCase } from "@/modules/focus/application/use-cases/should-show-cognitive-alert-use-case";
 
 export function FocusTimer() {
   const getTaskByIdUseCase = useMemo(() => makeGetTaskByIdUseCase(), []);
-
   const toggleTaskCompletedUseCase = useMemo(
     () => makeToggleTaskCompletedUseCase(),
     [],
@@ -52,12 +39,12 @@ export function FocusTimer() {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const { taskId } = useParams();
 
   const muteNotifications = useCognitiveSettingsStore(
     (state) => state.muteNotifications,
   );
 
-  const { taskId } = useParams();
   const { playFocusEnd, playBreakEnd } = useTimerSounds();
 
   const stateTask = location.state as Task | undefined;
@@ -70,7 +57,7 @@ export function FocusTimer() {
   const [cycle, setCycle] = useState(1);
   const [totalFocusCycles, setTotalFocusCycles] = useState(1);
 
-  const [phase, setPhase] = useState<Phase>("focus");
+  const [phase, setPhase] = useState<"focus" | "break" | "longBreak">("focus");
 
   const [isRunning, setIsRunning] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
@@ -80,11 +67,7 @@ export function FocusTimer() {
 
   const focusMinutes = task?.focusDuration ?? 30;
 
-  const focusDuration = 2; // teste
-  const breakDuration = FOCUS_CONFIG[focusMinutes].break;
-  const longBreakDuration = FOCUS_CONFIG[focusMinutes].longBreak;
-
-  const [timeLeft, setTimeLeft] = useState(focusDuration);
+  const [timeLeft, setTimeLeft] = useState(focusMinutes * 60);
 
   useEffect(() => {
     if (!taskId || stateTask) return;
@@ -102,7 +85,7 @@ export function FocusTimer() {
     }
 
     loadTask();
-  }, [taskId, stateTask, getTaskByIdUseCase, navigate]);
+  }, [taskId]);
 
   useEffect(() => {
     if (!isRunning) return;
@@ -136,82 +119,52 @@ export function FocusTimer() {
       playBreakEnd(muteNotifications);
     }
 
-    setHasStarted(false);
-    setIsRunning(false);
+    const session = new FocusSession({
+      phase,
+      cycle,
+      totalFocusCycles,
+    });
 
-    if (phase === "focus") {
-      if (cycle === TOTAL_CYCLES) {
-        setPhase("longBreak");
-        setTimeLeft(longBreakDuration);
-      } else {
-        setPhase("break");
-        setTimeLeft(breakDuration);
-      }
+    const result = getNextFocusPhaseUseCase({
+      session,
+      focusMinutes,
+    });
 
-      return;
-    }
-
-    const nextTotalCycles = totalFocusCycles + 1;
-
-    if (phase === "break") {
-      setCycle(cycle + 1);
-      setTotalFocusCycles(nextTotalCycles);
-
-      checkCognitiveLoadAlert(nextTotalCycles);
-
-      setPhase("focus");
-      setTimeLeft(focusDuration);
-      return;
-    }
-
-    if (phase === "longBreak") {
-      setCycle(1);
-      setTotalFocusCycles(nextTotalCycles);
-
-      checkCognitiveLoadAlert(nextTotalCycles);
-
-      setPhase("focus");
-      setTimeLeft(focusDuration);
-    }
-  }
-
-  function checkCognitiveLoadAlert(nextTotalCycles: number) {
-    if (!task) return;
-
-    const limit = COGNITIVE_ALERT_CYCLES[focusMinutes];
-
-    if (nextTotalCycles === limit) {
+    if (
+      shouldShowCognitiveAlertUseCase({
+        totalFocusCycles: result.totalFocusCycles,
+        focusMinutes,
+      })
+    ) {
       toast.warning("Talvez esta tarefa esteja grande demais.", {
         description: "Dividir em subtarefas menores pode ajudar.",
         action: {
           label: "Editar tarefa",
-          onClick: () => navigate(`/edit-task/${task.id}`),
+          onClick: () => navigate(`/edit-task/${task?.id}`),
         },
-        position: "bottom-center",
       });
     }
+
+    setPhase(result.phase);
+    setCycle(result.cycle);
+    setTotalFocusCycles(result.totalFocusCycles);
+    setTimeLeft(result.duration);
+
+    setHasStarted(false);
+    setIsRunning(false);
   }
 
   function toggleTimer() {
-    if (!hasStarted) {
-      setHasStarted(true);
-    }
-
+    if (!hasStarted) setHasStarted(true);
     setIsRunning((r) => !r);
   }
 
   async function finish() {
     if (!task) return;
 
-    try {
-      setIsRunning(false);
+    await toggleTaskCompletedUseCase.execute(task.id, true);
 
-      await toggleTaskCompletedUseCase.execute(task.id, true);
-
-      navigate("/");
-    } catch (error) {
-      console.error("Erro ao finalizar tarefa:", error);
-    }
+    navigate("/");
   }
 
   if (isLoading || !task) {
@@ -222,14 +175,14 @@ export function FocusTimer() {
     );
   }
 
-  const minutes = Math.floor(timeLeft / 60);
-  const seconds = timeLeft % 60;
+  const minutes = Math.floor(timeLeft / 60)
+    .toString()
+    .padStart(2, "0");
 
-  const formattedMinutes = minutes.toString().padStart(2, "0");
-  const formattedSeconds = seconds.toString().padStart(2, "0");
+  const seconds = (timeLeft % 60).toString().padStart(2, "0");
 
   return (
-    <div
+    <main
       className={cn(
         "flex min-h-screen items-center justify-center",
         phase !== "focus" && "bg-success/15",
@@ -244,35 +197,22 @@ export function FocusTimer() {
           phase={phase}
         />
 
-        {/* sessão */}
         <div className="flex border p-2 gap-2 border-primary/10 bg-primary/10 rounded-full">
           <Clock className="text-primary" size={20} />
-
           <span className="text-primary font-semibold text-body-sm">
             SESSÃO DE {focusMinutes} MINUTOS
           </span>
         </div>
 
-        {/* timer */}
         <div className="flex gap-4">
-          <TimerBox value={formattedMinutes} label="MINUTOS" phase={phase} />
-
-          <TimerBox value={formattedSeconds} label="SEGUNDOS" phase={phase} />
+          <TimerBox value={minutes} label="MINUTOS" phase={phase} />
+          <TimerBox value={seconds} label="SEGUNDOS" phase={phase} />
         </div>
 
-        {/* título */}
         <div className="text-center">
           <h1 className="text-heading-lg font-bold text-high-contrast">
             {task.title}
           </h1>
-
-          <p className="mt-2 text-muted text-body">
-            {phase === "longBreak"
-              ? "Intervalo longo - Respire fundo e levante um pouco."
-              : phase === "break"
-                ? "Intervalo curto - Aproveite para se alongar ou beber água."
-                : "Mantenha o foco. Você está indo bem."}
-          </p>
         </div>
 
         {phase === "focus" && <FocusTaskCard task={task} />}
@@ -288,25 +228,23 @@ export function FocusTimer() {
 
         <BaseButton
           variant="ghost"
-          className="[&_svg]:size-5 flex items-center gap-2 mt-2 cursor-pointer hover:bg-transparent hover:opacity-60"
+          className="[&_svg]:size-5 flex items-center gap-2 mt-2"
           onClick={() => {
             setIsRunning(false);
             setIsExitModalOpen(true);
           }}
         >
-          <LogOut className="text-muted-light" />
-
-          <span className="text-muted-light text-body-lg">Sair do foco</span>
+          <LogOut />
+          <span>Sair do foco</span>
         </BaseButton>
 
         <BaseButton
           variant="ghost"
-          className="[&_svg]:size-5 flex items-center gap-2 cursor-pointer hover:bg-transparent hover:opacity-60"
+          className="[&_svg]:size-5 flex items-center gap-2"
           onClick={() => setOpenSettings(true)}
         >
-          <Settings className="text-muted-light" />
-
-          <span className="text-muted-light text-body-lg">Configurações</span>
+          <Settings />
+          <span>Configurações</span>
         </BaseButton>
       </div>
 
@@ -317,6 +255,6 @@ export function FocusTimer() {
       />
 
       <CognitivePanel open={openSettings} onOpenChange={setOpenSettings} />
-    </div>
+    </main>
   );
 }
