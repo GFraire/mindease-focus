@@ -36,7 +36,7 @@ describe("BringLateTasksToTodayUseCase", () => {
     expect(taskRepository.update).toHaveBeenCalledTimes(3);
 
     for (const id of tasksId) {
-      expect(taskRepository.update).toHaveBeenCalledWith(id, {
+      expect(taskRepository.update).toHaveBeenCalledWith(2, {
         scheduledFor: todayFormatted,
       });
     }
