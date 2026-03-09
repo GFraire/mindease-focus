@@ -1,37 +1,33 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  CircleCheck,
-  Clock,
-  LogOut,
-  Medal,
-  Pause,
-  Play,
-  SkipForward,
-} from "lucide-react";
+import { Clock, LogOut } from "lucide-react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import Logo from "@/shared/ui/assets/logo.svg?react";
 
+import { FocusHeader } from "../components/focus-header";
+import { FocusProgress } from "../components/focus-progress";
+import { FocusTaskCard } from "../components/focus-task-card";
+import { FocusControls } from "../components/focus-controls";
 import { TimerBox } from "../components/timer-box";
 import { ExitFocusModal } from "../components/exit-focus-modal";
 
 import { BaseButton } from "@/shared/ui/components/form/base-button";
-import { Checkbox } from "@/shared/ui/components/ui/checkbox";
 
 import type { Task } from "@/modules/task/domain/entities/task";
+
 import {
   makeGetTaskByIdUseCase,
   makeToggleTaskCompletedUseCase,
 } from "@/modules/task/container";
+
 import { cn } from "@/shared/lib/utils";
 import { toast } from "sonner";
 
 const TOTAL_CYCLES = 4;
 
 const FOCUS_CONFIG = {
-  15: { break: 3 * 1, longBreak: 6 * 1 },
-  30: { break: 5 * 1, longBreak: 10 * 1 },
-  45: { break: 7 * 1, longBreak: 15 * 1 },
-  60: { break: 10 * 1, longBreak: 20 * 1 },
+  15: { break: 3, longBreak: 6 },
+  30: { break: 5, longBreak: 10 },
+  45: { break: 7, longBreak: 15 },
+  60: { break: 10, longBreak: 20 },
 };
 
 const COGNITIVE_ALERT_CYCLES = {
@@ -59,16 +55,23 @@ export function FocusTimer() {
 
   const [task, setTask] = useState<Task | null>(stateTask ?? null);
   const [isLoading, setIsLoading] = useState(!stateTask);
+
   const [cycle, setCycle] = useState(1);
   const [totalFocusCycles, setTotalFocusCycles] = useState(1);
+
   const [phase, setPhase] = useState<Phase>("focus");
+
   const [isRunning, setIsRunning] = useState(false);
-  const [isExitModalOpen, setIsExitModalOpen] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
+
+  const [isExitModalOpen, setIsExitModalOpen] = useState(false);
+
   const focusMinutes = task?.focusDuration ?? 30;
+
   const focusDuration = 2; // teste
   const breakDuration = FOCUS_CONFIG[focusMinutes].break;
   const longBreakDuration = FOCUS_CONFIG[focusMinutes].longBreak;
+
   const [timeLeft, setTimeLeft] = useState(focusDuration);
 
   useEffect(() => {
@@ -76,6 +79,7 @@ export function FocusTimer() {
 
     async function loadTask() {
       const task = await getTaskByIdUseCase.execute(taskId!);
+
       if (!task) {
         navigate("/");
         return;
@@ -117,6 +121,7 @@ export function FocusTimer() {
         setPhase("break");
         setTimeLeft(breakDuration);
       }
+
       return;
     }
 
@@ -125,7 +130,9 @@ export function FocusTimer() {
     if (phase === "break") {
       setCycle(cycle + 1);
       setTotalFocusCycles(nextTotalCycles);
+
       checkCognitiveLoadAlert(nextTotalCycles);
+
       setPhase("focus");
       setTimeLeft(focusDuration);
       return;
@@ -134,9 +141,27 @@ export function FocusTimer() {
     if (phase === "longBreak") {
       setCycle(1);
       setTotalFocusCycles(nextTotalCycles);
+
       checkCognitiveLoadAlert(nextTotalCycles);
+
       setPhase("focus");
       setTimeLeft(focusDuration);
+    }
+  }
+
+  function checkCognitiveLoadAlert(nextTotalCycles: number) {
+    if (!task) return;
+
+    const limit = COGNITIVE_ALERT_CYCLES[focusMinutes];
+
+    if (nextTotalCycles === limit) {
+      toast.warning("Talvez esta tarefa esteja grande demais.", {
+        description: "Dividir em subtarefas menores pode ajudar.",
+        action: {
+          label: "Editar tarefa",
+          onClick: () => navigate(`/edit-task/${task.id}`),
+        },
+      });
     }
   }
 
@@ -170,22 +195,6 @@ export function FocusTimer() {
     );
   }
 
-  function checkCognitiveLoadAlert(nextTotalCycles: number) {
-    if (!task) return;
-
-    const limit = COGNITIVE_ALERT_CYCLES[focusMinutes];
-
-    if (nextTotalCycles === limit) {
-      toast.warning("Talvez esta tarefa esteja grande demais.", {
-        description: "Dividir em subtarefas menores pode ajudar.",
-        action: {
-          label: "Editar tarefa",
-          onClick: () => navigate(`/edit-task/${task.id}`),
-        },
-      });
-    }
-  }
-
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
 
@@ -200,85 +209,31 @@ export function FocusTimer() {
       )}
     >
       <div className="flex flex-col items-center gap-6">
-        <div className="flex gap-2 items-center">
-          <Logo
-            className={cn(
-              "w-8 h-8",
-              phase === "focus" ? "text-primary" : "text-success",
-            )}
-          />
+        <FocusHeader phase={phase} />
 
-          <span
-            className={cn(
-              "text-heading! font-bold",
-              phase === "focus" ? "text-primary" : "text-success",
-            )}
-          >
-            MindEase Focus
-          </span>
-        </div>
+        <FocusProgress
+          cycle={cycle}
+          totalFocusCycles={totalFocusCycles}
+          phase={phase}
+        />
 
-        {/* barras */}
-        <div className="flex flex-col gap-2 items-center">
-          <div className="flex items-center gap-2">
-            {Array.from({ length: TOTAL_CYCLES }).map((_, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <div
-                  className={`h-2 w-14 rounded-full ${
-                    index < cycle ? "bg-primary" : "bg-muted-light/50"
-                  }`}
-                />
-
-                {index !== TOTAL_CYCLES - 1 && (
-                  <div
-                    className={`h-2 w-3 rounded-full ${
-                      index < cycle - 1 ||
-                      (phase !== "focus" && index === cycle - 1)
-                        ? "bg-success"
-                        : "bg-muted-light/50"
-                    }`}
-                  />
-                )}
-              </div>
-            ))}
-
-            <div
-              className={`h-2 w-6 rounded-full ${
-                phase === "longBreak" ? "bg-success" : "bg-muted-light/50"
-              }`}
-            />
-          </div>
-
-          <div className="flex gap-4 items-center">
-            <span className="text-body-small font-medium text-muted-light">
-              CICLO {cycle} DE {TOTAL_CYCLES}
-            </span>
-
-            {totalFocusCycles > 4 && (
-              <div className="flex gap-2 px-2 py-1 border border-muted-light rounded-full">
-                <Medal className="text-muted-light" />
-
-                <span className="text-body-small font-medium text-muted-light">
-                  {totalFocusCycles}° CICLO DE FOCO
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-
+        {/* sessão */}
         <div className="flex border p-2 gap-2 border-primary/10 bg-primary/10 rounded-full">
           <Clock className="text-primary" size={20} />
+
           <span className="text-primary font-semibold text-body-sm">
             SESSÃO DE {focusMinutes} MINUTOS
           </span>
         </div>
 
+        {/* timer */}
         <div className="flex gap-4">
           <TimerBox value={formattedMinutes} label="MINUTOS" phase={phase} />
 
           <TimerBox value={formattedSeconds} label="SEGUNDOS" phase={phase} />
         </div>
 
+        {/* título */}
         <div className="text-center">
           <h1 className="text-heading-lg font-bold text-high-contrast">
             {task.title}
@@ -293,71 +248,20 @@ export function FocusTimer() {
           </p>
         </div>
 
-        {task.subtasks.some((s) => s.trim() !== "") && phase === "focus" && (
-          <div className="flex flex-col gap-2 bg-card p-4 w-full rounded-md border border-border">
-            {task.subtasks
-              .filter((s) => s.trim() !== "")
-              .map((subtask, index) => (
-                <div
-                  className="flex items-center gap-4 p-3 bg-background rounded-md"
-                  key={index}
-                >
-                  <Checkbox className="border-muted-light size-5 border-2 cursor-pointer" />
+        {phase === "focus" && <FocusTaskCard task={task} />}
 
-                  <span className="text-body text-high-contrast">
-                    {subtask}
-                  </span>
-                </div>
-              ))}
-          </div>
-        )}
-
-        <div className="flex gap-4">
-          <BaseButton
-            onClick={toggleTimer}
-            className="[&_svg]:size-5! flex items-center gap-2 rounded-md bg-muted/10 px-8 py-2 w-42 cursor-pointer hover:bg-muted/15"
-          >
-            {isRunning ? (
-              <Pause className="text-muted" />
-            ) : (
-              <Play className="text-muted" />
-            )}
-            <span className="text-muted text-body-lg font-medium">
-              {!hasStarted ? "Iniciar" : isRunning ? "Pausar" : "Retomar"}
-            </span>
-          </BaseButton>
-
-          {phase === "focus" && (
-            <BaseButton
-              onClick={finish}
-              className="[&_svg]:size-5! flex items-center gap-2 w-42 cursor-pointer rounded-md bg-primary px-8 py-2"
-            >
-              <CircleCheck className="text-white! " />
-
-              <span className="text-white! text-body-lg font-medium">
-                Finalizar
-              </span>
-            </BaseButton>
-          )}
-
-          {phase !== "focus" && (
-            <BaseButton
-              onClick={handlePhaseEnd}
-              variant="ghost"
-              className="[&_svg]:size-5! flex items-center gap-2 w-42 cursor-pointer rounded-md px-8 py-2 hover:bg-transparent hover:opacity-80"
-            >
-              <SkipForward className="text-muted " />
-
-              <span className="text-muted text-body-lg font-medium">
-                Pular intervalo
-              </span>
-            </BaseButton>
-          )}
-        </div>
+        <FocusControls
+          phase={phase}
+          isRunning={isRunning}
+          hasStarted={hasStarted}
+          onToggle={toggleTimer}
+          onFinish={finish}
+          onSkip={handlePhaseEnd}
+        />
 
         <BaseButton
           variant="ghost"
-          className="[&_svg]:size-5! flex items-center gap-2 mt-2 cursor-pointer hover:bg-transparent hover:opacity-60"
+          className="[&_svg]:size-5 flex items-center gap-2 mt-2 cursor-pointer hover:bg-transparent hover:opacity-60"
           onClick={() => {
             setIsRunning(false);
             setIsExitModalOpen(true);
