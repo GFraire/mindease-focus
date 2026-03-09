@@ -43,7 +43,7 @@ describe("translateAuthError", () => {
   });
 
   it("should return default message for undefined", () => {
-    const result = translateAuthError(undefined as any);
+    const result = translateAuthError(undefined);
     expect(result).toBe("Ocorreu um erro inesperado.");
   });
 });

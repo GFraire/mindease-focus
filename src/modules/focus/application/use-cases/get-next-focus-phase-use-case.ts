@@ -28,7 +28,7 @@ export function getNextFocusPhaseUseCase({
         phase: "longBreak",
         cycle: session.cycle,
         totalFocusCycles: session.totalFocusCycles,
-        duration: config.longBreak,
+        duration: config.longBreak * 60,
       };
     }
 
@@ -36,7 +36,7 @@ export function getNextFocusPhaseUseCase({
       phase: "break",
       cycle: session.cycle,
       totalFocusCycles: session.totalFocusCycles,
-      duration: config.break,
+      duration: config.break * 60,
     };
   }
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Sidebar } from "@/shared/ui/components/sidebar";
 import { FocusNowCard } from "../components/focus-now-card";
 import { TaskCard } from "../components/task-card";
@@ -50,11 +50,7 @@ export function Home() {
   const [lateTasksCount, setLateTasksCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    reloadTasks();
-  }, [user, energyLevel]);
-
-  async function reloadTasks() {
+  const reloadTasks = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -96,7 +92,7 @@ export function Home() {
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [user, energyLevel, listTasksByDateUseCase, listLateTasksUseCase]);
 
   async function handleDeleteTask(taskId: string) {
     try {
@@ -171,6 +167,10 @@ export function Home() {
   }
 
   const hasTasks = focusTask || nextTasks.length > 0;
+
+  useEffect(() => {
+    reloadTasks();
+  }, [reloadTasks]);
 
   if (isLoading) {
     return (

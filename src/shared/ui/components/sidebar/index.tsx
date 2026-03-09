@@ -108,7 +108,7 @@ export function Sidebar() {
             </BaseButton>
 
             <BaseButton
-              className="flex items-center gap-3 rounded-md justify-start text-red-400 hover:bg-red-400/10 cursor-pointer"
+              className="flex items-center gap-3 rounded-md justify-start text-red-400 hover:bg-red-400/10 cursor-pointer hover:text-red-400"
               variant="ghost"
               onClick={handleLogout}
             >

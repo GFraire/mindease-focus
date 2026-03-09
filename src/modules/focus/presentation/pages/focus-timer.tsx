@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Clock, LogOut, Settings } from "lucide-react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
@@ -69,46 +69,7 @@ export function FocusTimer() {
 
   const [timeLeft, setTimeLeft] = useState(focusMinutes * 60);
 
-  useEffect(() => {
-    if (!taskId || stateTask) return;
-
-    async function loadTask() {
-      const task = await getTaskByIdUseCase.execute(taskId!);
-
-      if (!task) {
-        navigate("/");
-        return;
-      }
-
-      setTask(task);
-      setIsLoading(false);
-    }
-
-    loadTask();
-  }, [taskId]);
-
-  useEffect(() => {
-    if (!isRunning) return;
-
-    const interval = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          handlePhaseEnd();
-          return 0;
-        }
-
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [isRunning, phase]);
-
-  useEffect(() => {
-    phaseEndingRef.current = false;
-  }, [phase]);
-
-  function handlePhaseEnd() {
+  const handlePhaseEnd = useCallback(() => {
     if (phaseEndingRef.current) return;
 
     phaseEndingRef.current = true;
@@ -152,7 +113,17 @@ export function FocusTimer() {
 
     setHasStarted(false);
     setIsRunning(false);
-  }
+  }, [
+    phase,
+    cycle,
+    totalFocusCycles,
+    focusMinutes,
+    muteNotifications,
+    playFocusEnd,
+    playBreakEnd,
+    navigate,
+    task?.id,
+  ]);
 
   function toggleTimer() {
     if (!hasStarted) setHasStarted(true);
@@ -166,6 +137,46 @@ export function FocusTimer() {
 
     navigate("/");
   }
+
+  useEffect(() => {
+    if (!taskId || stateTask) return;
+
+    async function loadTask() {
+      const task = await getTaskByIdUseCase.execute(taskId!);
+
+      if (!task) {
+        navigate("/");
+        return;
+      }
+
+      setTask(task);
+      setIsLoading(false);
+    }
+
+    loadTask();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [taskId]);
+
+  useEffect(() => {
+    if (!isRunning) return;
+
+    const interval = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          handlePhaseEnd();
+          return 0;
+        }
+
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isRunning, phase, handlePhaseEnd]);
+
+  useEffect(() => {
+    phaseEndingRef.current = false;
+  }, [phase]);
 
   if (isLoading || !task) {
     return (
@@ -226,26 +237,28 @@ export function FocusTimer() {
           onSkip={handlePhaseEnd}
         />
 
-        <BaseButton
-          variant="ghost"
-          className="[&_svg]:size-5 flex items-center gap-2 mt-2"
-          onClick={() => {
-            setIsRunning(false);
-            setIsExitModalOpen(true);
-          }}
-        >
-          <LogOut />
-          <span>Sair do foco</span>
-        </BaseButton>
+        <div className="flex flex-col gap-1">
+          <BaseButton
+            variant="ghost"
+            className="[&_svg]:size-5 flex items-center gap-2 cursor-pointer"
+            onClick={() => setOpenSettings(true)}
+          >
+            <Settings className="text-muted" />
+            <span className="text-muted">Configurações</span>
+          </BaseButton>
 
-        <BaseButton
-          variant="ghost"
-          className="[&_svg]:size-5 flex items-center gap-2"
-          onClick={() => setOpenSettings(true)}
-        >
-          <Settings />
-          <span>Configurações</span>
-        </BaseButton>
+          <BaseButton
+            variant="ghost"
+            className="[&_svg]:size-5 flex items-center gap-2 mt-2 cursor-pointer"
+            onClick={() => {
+              setIsRunning(false);
+              setIsExitModalOpen(true);
+            }}
+          >
+            <LogOut className="text-muted" />
+            <span className="text-muted">Sair do foco</span>
+          </BaseButton>
+        </div>
       </div>
 
       <ExitFocusModal

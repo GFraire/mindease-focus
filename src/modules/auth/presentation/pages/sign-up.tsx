@@ -39,7 +39,7 @@ export function SignUp() {
       });
 
       navigate("/");
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error("Erro ao criar conta", {
         description: translateAuthError(error),
         position: "bottom-center",

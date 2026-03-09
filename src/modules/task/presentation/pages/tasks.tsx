@@ -110,6 +110,7 @@ export function Tasks() {
     }
 
     loadTasks();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [customDate, user]);
 
   useEffect(() => {
@@ -118,6 +119,7 @@ export function Tasks() {
 
     setDateTasks(sortedDateTasks);
     setLateTasks(sortedLateTasks);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [energyLevel]);
 
   useEffect(() => {
@@ -136,6 +138,7 @@ export function Tasks() {
     setFilteredLateTasks(
       sortTasksByStatusAndEnergy(filteredLateTasks, energyLevel),
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [taskTitle, dateTasks, lateTasks]);
 
   async function handleBringAllToToday() {

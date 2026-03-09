@@ -21,7 +21,9 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
     { label, showLabel = true, className, id, error, type, leftIcon, ...props },
     ref,
   ) {
-    const inputId = id ?? useId();
+    const generatedId = useId();
+    const inputId = id ?? generatedId;
+
     const errorId = `${inputId}-error`;
 
     const [showPassword, setShowPassword] = useState(false);

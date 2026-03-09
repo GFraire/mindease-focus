@@ -34,7 +34,7 @@ export function SignIn() {
       });
 
       navigate("/");
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error("Erro ao entrar", {
         description: translateAuthError(error),
         position: "bottom-center",

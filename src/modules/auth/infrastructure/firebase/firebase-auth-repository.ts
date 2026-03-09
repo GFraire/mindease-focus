@@ -15,6 +15,11 @@ interface RegisterData {
   password: string;
 }
 
+interface LoginData {
+  email: string;
+  password: string;
+}
+
 export class FirebaseAuthRepository implements AuthRepository {
   async register({ fullName, email, password }: RegisterData): Promise<void> {
     const userCredential = await createUserWithEmailAndPassword(
@@ -28,7 +33,7 @@ export class FirebaseAuthRepository implements AuthRepository {
     });
   }
 
-  async login({ email, password }: any): Promise<User> {
+  async login({ email, password }: LoginData): Promise<User> {
     const credential = await signInWithEmailAndPassword(auth, email, password);
 
     const firebaseUser = credential.user;

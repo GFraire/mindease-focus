@@ -23,7 +23,7 @@ describe("getNextFocusPhaseUseCase", () => {
       phase: "break",
       cycle: 1,
       totalFocusCycles: 1,
-      duration: FOCUS_CONFIG[30].break,
+      duration: FOCUS_CONFIG[30].break * 60,
     });
   });
 
@@ -43,7 +43,7 @@ describe("getNextFocusPhaseUseCase", () => {
       phase: "longBreak",
       cycle: TOTAL_CYCLES,
       totalFocusCycles: 3,
-      duration: FOCUS_CONFIG[30].longBreak,
+      duration: FOCUS_CONFIG[30].longBreak * 60,
     });
   });
 
@@ -99,6 +99,6 @@ describe("getNextFocusPhaseUseCase", () => {
       focusMinutes: 45,
     });
 
-    expect(result.duration).toBe(FOCUS_CONFIG[45].break);
+    expect(result.duration).toBe(FOCUS_CONFIG[45].break * 60);
   });
 });
