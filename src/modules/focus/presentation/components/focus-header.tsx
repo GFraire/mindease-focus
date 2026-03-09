@@ -1,6 +1,6 @@
 import Logo from "@/shared/ui/assets/logo.svg?react";
 import { cn } from "@/shared/lib/utils";
-import type { Phase } from "../pages/focus-timer";
+import type { Phase } from "../../domain/entities/focus-session";
 
 interface Props {
   phase: Phase;

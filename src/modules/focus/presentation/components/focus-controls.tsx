@@ -1,6 +1,6 @@
 import { BaseButton } from "@/shared/ui/components/form/base-button";
 import { CircleCheck, Pause, Play, SkipForward } from "lucide-react";
-import type { Phase } from "../pages/focus-timer";
+import type { Phase } from "../../domain/entities/focus-session";
 
 interface Props {
   phase: Phase;

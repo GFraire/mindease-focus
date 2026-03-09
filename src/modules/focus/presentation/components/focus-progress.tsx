@@ -1,5 +1,5 @@
 import { Medal } from "lucide-react";
-import type { Phase } from "../pages/focus-timer";
+import type { Phase } from "../../domain/entities/focus-session";
 
 interface Props {
   cycle: number;
