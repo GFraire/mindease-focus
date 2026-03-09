@@ -10,9 +10,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check source branch
+      - name: Validate source branch
         run: |
+          echo "Branch origem: ${{ github.head_ref }}"
+
           if [[ "${{ github.head_ref }}" != "develop" ]]; then
-            echo "PR para main só pode vir da branch develop."
+            echo "❌ PR para main só pode vir da branch develop."
             exit 1
           fi
+
+          echo "✅ PR válido"
