@@ -48,14 +48,14 @@ export function SignUp() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col justify-between items-center bg-background">
+    <div className="min-h-screen flex flex-col bg-background">
       <HeaderLogin />
 
       <main
-        className="w-full flex justify-center"
+        className="flex-1 w-full flex justify-center items-center px-4 sm:px-6"
         aria-labelledby="signup-title"
       >
-        <div className="w-full max-w-md p-6 sm:p-8 flex flex-col gap-8 bg-card rounded-lg shadow">
+        <div className="w-full max-w-md p-6 sm:p-8 flex flex-col gap-8 bg-card rounded-lg shadow-sm">
           <header className="flex flex-col gap-2">
             <h1
               id="signup-title"
@@ -65,14 +65,15 @@ export function SignUp() {
             </h1>
 
             <p className="text-center text-body text-muted">
-              Sua jornada para o foco e bem-estar <br />
+              Sua jornada para o foco e bem-estar
+              <br className="hidden sm:block" />
               começa aqui.
             </p>
           </header>
 
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-2 w-full"
+            className="flex flex-col gap-3 w-full"
             aria-label="Formulário de criação de conta"
           >
             <TextInput
@@ -105,7 +106,7 @@ export function SignUp() {
             />
 
             <BaseButton
-              className="mt-6 w-full flex items-center justify-center gap-2 cursor-pointer"
+              className="mt-4 w-full flex items-center justify-center gap-2 cursor-pointer"
               type="submit"
               loading={isSubmitting}
               aria-busy={isSubmitting}
@@ -118,18 +119,15 @@ export function SignUp() {
 
           <p className="text-body text-muted text-center">
             Já tem uma conta?{" "}
-            <Link
-              className="underline text-body text-primary font-bold"
-              to="/sign-in"
-            >
+            <Link className="underline text-primary font-bold" to="/sign-in">
               Entrar
             </Link>
           </p>
         </div>
       </main>
 
-      <footer className="flex items-center h-20">
-        <span className="text-center text-muted-light text-body-sm">
+      <footer className="py-6 px-4 text-center">
+        <span className="text-muted-light text-body-sm">
           © {new Date().getFullYear()} MindEase Focus. Projetado para sua
           tranquilidade.
         </span>

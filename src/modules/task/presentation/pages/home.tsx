@@ -178,14 +178,14 @@ export function Home() {
   }
 
   return (
-    <div className="flex h-full w-full">
+    <div className="flex min-h-screen w-full bg-background">
       <Sidebar />
 
       <main
-        className="w-full flex flex-col p-8 gap-6"
+        className="flex-1 flex flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8 mx-auto w-full"
         aria-labelledby="home-heading"
       >
-        <header className="flex flex-col gap-3">
+        <header className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <h1
               id="home-heading"
@@ -203,9 +203,9 @@ export function Home() {
             <div
               role="alert"
               aria-live="polite"
-              className="flex items-center justify-between bg-warning/10 border border-warning/30 rounded-lg px-4 py-3"
+              className="flex flex-row sm:items-center justify-between gap-3 bg-warning/10 border border-warning/30 rounded-lg px-4 py-3"
             >
-              <span className="flex gap-2 items-center text-sm text-warning font-medium">
+              <span className="flex gap-2 items-center text-body-sm text-warning font-medium">
                 <AlertTriangle size={18} aria-hidden="true" />
                 Você tem {lateTasksCount} tarefa
                 {lateTasksCount > 1 && "s"} atrasada
@@ -216,7 +216,8 @@ export function Home() {
                 onClick={() => navigate("/tasks")}
                 variant="link"
                 aria-label="Ver lista de tarefas atrasadas"
-                className="text-body-sm font-semibold text-warning cursor-pointer! focus:outline-none focus:ring-2 focus:ring-warning"
+                size="sm"
+                className="text-body-sm font-semibold text-warning cursor-pointer focus:outline-none focus:ring-2 focus:ring-warning"
               >
                 Ver tarefas
               </BaseButton>
@@ -227,7 +228,7 @@ export function Home() {
         {!hasTasks && (
           <section
             aria-label="Nenhuma tarefa para hoje"
-            className="flex flex-col items-center justify-center gap-2 p-12 border border-border rounded-md bg-card h-full"
+            className="flex flex-col items-center justify-center gap-2 p-8 sm:p-12 border border-border rounded-md bg-card flex-1"
           >
             <ClipboardList
               size={32}
@@ -239,7 +240,7 @@ export function Home() {
               Nenhuma tarefa para hoje
             </span>
 
-            <span className="text-sm text-muted">
+            <span className="text-sm text-muted text-center">
               Adicione tarefas para começar seu dia com foco.
             </span>
 
@@ -267,7 +268,7 @@ export function Home() {
 
         {focusTask && (
           <section className="flex flex-col gap-4 flex-1">
-            <div className="flex justify-between items-center">
+            <div className="flex items-center justify-between flex-wrap gap-2">
               <h2
                 id="next-tasks-heading"
                 className="text-heading font-bold text-high-contrast"
@@ -285,13 +286,13 @@ export function Home() {
               </BaseButton>
             </div>
 
-            <Separator className="mb-2" />
+            <Separator />
 
             {nextTasks.length > 0 ? (
               <div
                 role="list"
                 aria-labelledby="next-tasks-heading"
-                className="flex flex-col gap-2"
+                className="flex flex-col gap-3"
               >
                 {nextTasks.map((task) => (
                   <TaskCard
@@ -315,11 +316,11 @@ export function Home() {
                   aria-hidden="true"
                 />
 
-                <span className="text-body text-muted">
+                <span className="text-body text-muted text-center">
                   Nenhuma outra tarefa pendente agora
                 </span>
 
-                <span className="text-body-sm text-muted">
+                <span className="text-body-sm text-muted text-center">
                   Continue focando na tarefa atual.
                 </span>
               </div>

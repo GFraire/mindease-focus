@@ -106,14 +106,14 @@ export function TaskForm({
     <form
       onSubmit={handleSubmit}
       aria-labelledby="task-form-title"
-      className="w-full max-w-lg space-y-6 rounded-md bg-card p-6 shadow relative"
+      className="w-full max-w-lg space-y-6 rounded-md bg-card p-4 sm:p-6 shadow relative"
     >
-      <header className="flex flex-col gap-1 items-center">
+      <header className="flex flex-col gap-1 items-center text-center sm:text-left">
         <button
           type="button"
           aria-label="Voltar para a página anterior"
           onClick={goBack}
-          className="absolute cursor-pointer left-6 top-6"
+          className="absolute cursor-pointer left-4 sm:left-6 top-4 sm:top-6"
         >
           <Undo2 aria-hidden="true" />
         </button>
@@ -169,7 +169,7 @@ export function TaskForm({
         <div
           role="radiogroup"
           aria-label="Nível de energia necessário"
-          className="flex gap-2"
+          className="flex flex-wrap gap-2"
         >
           <SelectButton
             role="radio"
@@ -213,7 +213,7 @@ export function TaskForm({
         <div
           role="radiogroup"
           aria-label="Quando realizar a tarefa"
-          className="flex gap-2"
+          className="flex flex-wrap gap-2"
         >
           <SelectButton
             role="radio"
@@ -268,7 +268,7 @@ export function TaskForm({
         <div
           role="radiogroup"
           aria-label="Duração do bloco de foco"
-          className="flex gap-2"
+          className="flex flex-wrap gap-2"
         >
           {[15, 30, 45, 60].map((duration) => (
             <SelectButton

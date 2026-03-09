@@ -56,7 +56,7 @@ export function TaskListView({
           className="flex flex-col gap-4"
           aria-labelledby="late-tasks-title"
         >
-          <header className="flex items-start justify-between">
+          <header className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
             <div className="flex items-center gap-2">
               <History className="text-muted" aria-hidden="true" />
 
@@ -115,7 +115,7 @@ export function TaskListView({
           className="flex flex-col gap-4"
           aria-labelledby="date-tasks-title"
         >
-          <header className="flex items-center gap-2">
+          <header className="flex flex-wrap items-center gap-2">
             <CalendarCheck className="text-muted" aria-hidden="true" />
 
             <h2
@@ -153,7 +153,10 @@ export function TaskListView({
           className="flex items-center justify-center h-full flex-col gap-4 py-10"
           aria-live="polite"
         >
-          <Sprout className="mb-4" size={150} aria-hidden="true" />
+          <Sprout
+            className="mb-4 h-24 w-24 sm:h-37.5 sm:w-37.5"
+            aria-hidden="true"
+          />
 
           <h2 className="text-heading font-bold text-high-contrast">
             Sua lista está limpa

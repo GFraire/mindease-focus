@@ -283,11 +283,11 @@ export function Tasks() {
   }
 
   return (
-    <div className="flex h-screen w-full">
+    <div className="flex min-h-screen w-full">
       <Sidebar />
 
       <main
-        className="flex flex-col gap-6 p-8 w-full h-screen"
+        className="flex flex-col gap-6 p-4 sm:p-6 lg:p-8 w-full min-h-screen"
         aria-labelledby="tasks-page-title"
       >
         <h1 id="tasks-page-title" className="sr-only">
@@ -319,7 +319,7 @@ export function Tasks() {
           aria-live="polite"
           aria-busy={loading}
           aria-label="Lista de tarefas"
-          className="flex-1"
+          className="flex-1 w-full"
         >
           {viewMode === "list" && (
             <TaskListView

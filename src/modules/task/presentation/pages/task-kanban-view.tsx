@@ -36,7 +36,7 @@ export function TaskKanbanView({
     <section
       aria-label="Quadro de tarefas em formato kanban"
       aria-live="polite"
-      className="grid grid-cols-3 gap-6 h-full min-h-0 overflow-hidden"
+      className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 h-full min-h-0 overflow-auto"
     >
       {/* PENDENTE */}
       <div role="region" aria-labelledby="kanban-pending-title">

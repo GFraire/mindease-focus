@@ -78,17 +78,17 @@ export function TaskCard({
   return (
     <article
       aria-labelledby={titleId}
-      className="flex items-center justify-between rounded-lg border border-border bg-card p-4"
+      className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-lg border border-border bg-card p-4"
     >
       <div
         className={cn(
-          "flex items-center gap-4",
+          "flex items-start sm:items-center gap-3 sm:gap-4",
           late && "opacity-70",
           task.completed && "opacity-60",
         )}
       >
         <Checkbox
-          className="cursor-pointer h-5 w-5 border-muted-light"
+          className="cursor-pointer h-5 w-5 border-muted-light mt-1 sm:mt-0"
           checked={task.completed}
           aria-labelledby={titleId}
           aria-label={
@@ -112,7 +112,7 @@ export function TaskCard({
           </span>
 
           <div
-            className="flex items-center gap-4 text-xs text-muted"
+            className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-muted"
             role="group"
             aria-label="Informações da tarefa"
           >
@@ -158,7 +158,7 @@ export function TaskCard({
         </div>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex items-center justify-end gap-2">
         {late && onBringToToday && (
           <button
             aria-label={`Trazer tarefa ${task.title} para hoje`}

@@ -100,7 +100,7 @@ export function EditTask() {
 
   return (
     <main
-      className="flex items-center justify-center bg-background py-10 scroll-auto"
+      className="flex items-center justify-center bg-background py-8 px-4 sm:px-6 lg:px-8 scroll-auto"
       aria-labelledby="edit-task-title"
     >
       <h1 id="edit-task-title" className="sr-only">

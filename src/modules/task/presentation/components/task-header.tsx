@@ -23,7 +23,7 @@ export function TasksHeader({
 
   return (
     <header
-      className="flex gap-3 items-center w-full"
+      className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-3 w-full"
       aria-labelledby="tasks-header-title"
     >
       <div className="flex flex-col flex-1 gap-1">
@@ -37,12 +37,15 @@ export function TasksHeader({
         <p className="text-body text-muted">{subtitle}</p>
       </div>
 
-      <div aria-label="Modo de visualização das tarefas">
+      <div
+        aria-label="Modo de visualização das tarefas"
+        className="flex items-center gap-2"
+      >
         <ViewSwitcher value={viewMode} onChange={onChangeViewMode} />
       </div>
 
       <BaseButton
-        className="bg-primary text-white! cursor-pointer"
+        className="bg-primary text-white! cursor-pointer w-full sm:w-auto"
         onClick={onCreateTask}
         aria-label="Criar nova tarefa"
       >

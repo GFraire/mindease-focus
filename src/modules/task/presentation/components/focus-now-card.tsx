@@ -26,16 +26,19 @@ export function FocusNowCard({
     <section
       aria-labelledby={titleId}
       aria-live="polite"
-      className="w-full flex rounded-md shadow overflow-hidden border border-border bg-card"
+      className="w-full flex flex-col sm:flex-row rounded-md shadow overflow-hidden border border-border bg-card"
     >
       <div
-        className="flex items-center justify-center w-50 bg-linear-to-b from-indigo-600 to-purple-600"
+        className="flex items-center justify-center h-28 sm:h-auto sm:w-50 bg-linear-to-b from-indigo-600 to-purple-600"
         aria-hidden="true"
       >
-        <Target className="h-12 w-12 text-white" aria-hidden="true" />
+        <Target
+          className="h-10 w-10 sm:h-12 sm:w-12 text-white"
+          aria-hidden="true"
+        />
       </div>
 
-      <div className="flex flex-1 flex-col justify-between gap-4 p-6">
+      <div className="flex flex-1 flex-col justify-between gap-4 p-4 sm:p-6">
         <header className="flex flex-col gap-2">
           <span className="text-caption font-bold uppercase tracking-wide text-primary">
             Em foco agora
@@ -59,7 +62,7 @@ export function FocusNowCard({
         </header>
 
         <div
-          className="flex items-center gap-4"
+          className="flex flex-row  items-center gap-3 sm:gap-4"
           role="group"
           aria-label={`Ações da tarefa ${task.title}`}
         >
