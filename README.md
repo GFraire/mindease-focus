@@ -82,11 +82,11 @@ http://localhost:5173
 
 ## 🏗️ 7. Arquitetura do Projeto
 
-O projeto foi desenvolvido utilizando **Clean Architecture**, organizada em **módulos de domínio**, para manter o código desacoplado, escalável e fácil de manter.
+O projeto foi estruturado utilizando **Clean Architecture** com organização **modular por domínio**.
 
-Cada módulo representa uma funcionalidade da aplicação (por exemplo: autenticação, tarefas, etc.) e contém suas próprias camadas de domínio, aplicação e infraestrutura.
+Cada módulo representa uma funcionalidade da aplicação (ex: `auth`, `tasks`) e possui suas próprias camadas, permitindo isolamento de responsabilidades e melhor escalabilidade do sistema.
 
-### Camadas utilizadas
+### Camadas da arquitetura
 
 **Domain**
 
@@ -96,49 +96,48 @@ Contém as regras de negócio da aplicação:
 - interfaces de repositórios
 - regras de domínio
 
-Essa camada não depende de nenhuma outra.
+Essa camada **não depende de nenhuma outra**.
 
 **Application**
 
 Responsável pelos **casos de uso da aplicação**.
 
-Aqui ficam:
+Inclui:
 
 - use cases
 - DTOs
-- regras de orquestração da aplicação
+- orquestração das regras de negócio
 
 **Infrastructure**
 
-Implementações externas da aplicação, como:
+Implementações externas, como:
 
 - Firebase
-- repositórios concretos
-- serviços externos
+- repositórios
+- integrações com serviços
 
 **Presentation**
 
-Camada responsável pela interface do usuário:
+Responsável pela interface da aplicação:
 
 - páginas
 - componentes
 - hooks
-- estado da aplicação
+- gerenciamento de estado
 
----
+### Vantagens dessa abordagem
 
-### Vantagens dessa arquitetura
+- baixo acoplamento entre camadas
+- melhor organização do código
+- facilidade para testar regras de negócio
+- maior escalabilidade do projeto
+- facilidade para substituir tecnologias externas (ex: banco de dados)
 
-✔ **Baixo acoplamento** entre as camadas  
-✔ **Facilidade para testar regras de negócio**  
-✔ **Escalabilidade do projeto**  
-✔ **Separação clara de responsabilidades**  
-✔ **Facilidade para trocar tecnologias externas (ex: Firebase)**  
-
-Além disso, a organização **por módulos** permite que cada funcionalidade evolua de forma independente, tornando o projeto mais fácil de manter conforme ele cresce.
+A estrutura **modular por domínio** permite que novas funcionalidades sejam adicionadas sem impactar outras partes do sistema.
 
 ## 📂 8. Estrutura de Pastas
 
+```env
 mindease-focus/
 ├─── app/
 ├─── modules/
@@ -195,3 +194,4 @@ mindease-focus/
     └─── tils/
         ├─── date/
         └─── translate/
+```
