@@ -55,7 +55,6 @@ export function FocusProgress({ cycle, totalFocusCycles, phase }: Props) {
         />
       </div>
 
-      {/* descrição para leitores de tela */}
       <span className="sr-only" aria-live="polite">
         Você está no ciclo {cycle} de {TOTAL_CYCLES}. Total de sessões de foco
         concluídas: {totalFocusCycles}.

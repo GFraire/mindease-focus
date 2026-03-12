@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { translateAuthError } from "./translate-auth-error";
+import { translateAuthError } from "../translate-auth-error";
 
 describe("translateAuthError", () => {
   it("should return user not found message", () => {

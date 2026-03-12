@@ -50,7 +50,6 @@ export function CreateTask() {
       className="flex items-center justify-center bg-background py-8 px-4 sm:px-6 lg:px-8 scroll-auto"
       aria-labelledby="create-task-title"
     >
-      {/* título acessível da página */}
       <h1 id="create-task-title" className="sr-only">
         Criar nova tarefa
       </h1>
@@ -65,7 +64,6 @@ export function CreateTask() {
         />
       </section>
 
-      {/* status para leitores de tela */}
       {isLoading && (
         <span role="status" aria-live="polite" className="sr-only">
           Criando tarefa...

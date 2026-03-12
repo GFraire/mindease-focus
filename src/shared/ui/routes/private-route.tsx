@@ -6,7 +6,7 @@ export function PrivateRoute() {
   const isLoading = useAuthStore((state) => state.isLoading);
 
   if (isLoading) {
-    return null; // ou <Spinner />
+    return null;
   }
 
   if (!user) {

@@ -11,7 +11,6 @@ export function useTimerSounds() {
     focusEndSound.current.volume = 0.4;
     breakEndSound.current.volume = 0.4;
 
-    // pré-carregar
     focusEndSound.current.load();
     breakEndSound.current.load();
   }, []);

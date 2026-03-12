@@ -41,7 +41,6 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           </label>
         )}
 
-        {/* wrapper apenas do input */}
         <div className="relative">
           {leftIcon && (
             <span
@@ -80,7 +79,6 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           )}
         </div>
 
-        {/* erro separado */}
         {error && (
           <span id={errorId} className="text-sm text-red-500">
             {error}
